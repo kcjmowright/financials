@@ -1,0 +1,5 @@
+coverage/**
+scratch/**
+lib/**
+.idea
+node_modules

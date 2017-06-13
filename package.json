@@ -1,0 +1,35 @@
+{
+  "name": "financials",
+  "version": "1.0.0",
+  "description": "Financial algorithms in TypeScript",
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/**/*.ts",
+    "clean": "rm -fR ./lib ./coverage ./src/**/*.map",
+    "start": "npm run build:live",
+    "test": "tsc && istanbul cover --print none --report json jasmine-node lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
+  },
+  "author": "jwright",
+  "license": "BSD-Source-Code",
+  "devDependencies": {
+    "@types/jasmine": "^2.5.47",
+    "@types/lodash": "^4.14.64",
+    "@types/node": "^7.0.31",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.6.0",
+    "jasmine-node": "^1.14.5",
+    "nodemon": "^1.11.0",
+    "remap-istanbul": "^0.9.5",
+    "through": "^2.3.8",
+    "ts-node": "^3.0.6",
+    "typescript": "^2.3.2",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "csv-parse": "^1.2.0",
+    "lodash": "^4.17.4",
+    "stream-transform": "^0.1.2",
+    "through": "^2.3.8"
+  }
+}

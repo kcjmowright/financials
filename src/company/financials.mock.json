@@ -1,0 +1,21 @@
+{
+  "assets": 9841,
+  "beta": 1.48,
+  "capitalExpenditure": 176,
+  "changesInWorkingCapital": 679,
+  "company": {
+    "name": "NVIDIA Corp",
+    "ticker": "NVDA"
+  },
+  "debt": 2816,
+  "equity": 5762,
+  "incomePreTax": 1905,
+  "incomeTaxTotal": 239,
+  "interestExpense": 58,
+  "liabilities": 4079,
+  "netIncome": 1666,
+  "netSales": 6910,
+  "nonCashDepreciation": 670,
+  "outstandingShares": 594.54,
+  "revenue": 6910
+}
