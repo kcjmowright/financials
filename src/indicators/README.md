@@ -1,9 +1,16 @@
-##Relative Strength Index (RSI)
+Relative Strength Index (RSI)
+============================
 
-###Calculation
+### Calculation
 
-###Bullish Failure Swing
+( 100.0 - ( 100.0 / ( 1.0 + rs ) ))
+
+where rs = average gains / average losses
+
+### Bullish Failure Swing
 
 ![Bullish Failure Swing](relative-strength-bullish-failure-swing.png)
 
-###Bearish Failure Swing
+### Bearish Failure Swing
+
+(todo)
