@@ -1,16 +1,16 @@
 import * as parse from 'csv-parse';
 import * as transform from 'stream-transform';
-import * as process from 'process';
+import * as _ from 'lodash';
 
 import {HttpsFetchStream} from './https-fetch-stream';
+import {IncomingMessage} from 'https';
 
 /**
  *
  * Requests quote data from quotemedia.com for the given ticker symbol and parses the response into an array of quote objects.
  */
 export class QuotemediaStream extends HttpsFetchStream {
-  public rawData: string = '';
-  public data: any;
+  public data: any[] = [];
 
   constructor(public symbol: string, public date = new Date()) {
     super(`app.quotemedia.com`, `/quotetools/getHistoryDownload.csv?&webmasterId=501&startDay=01&startMonth=01` +
@@ -18,7 +18,7 @@ export class QuotemediaStream extends HttpsFetchStream {
       `&isRanged=true&symbol=${symbol}`);
   }
 
-  public onResponse = (res) => {
+  public onResponse = (res: IncomingMessage, callback?: Function) => {
     let parser = parse({
       auto_parse: true,
       auto_parse_date: false,
@@ -26,9 +26,15 @@ export class QuotemediaStream extends HttpsFetchStream {
       relax_column_count: true,
       trim: true
     });
-    let transformer = transform((record, callback) => {
-      callback(null, JSON.stringify(record));
+    let transformer = transform((record, done) => {
+      this.data.push(record);
+      done();
     });
-    res.pipe(parser).pipe(transformer).pipe(process.stdout);
+    transformer.on('finish', () => {
+      if(_.isFunction(callback)) {
+        callback(this.data);
+      }
+    });
+    res.pipe(parser).pipe(transformer);
   };
 }

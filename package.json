@@ -6,9 +6,9 @@
   "types": "lib/index",
   "scripts": {
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/**/*.ts",
-    "clean": "rm -fR ./lib ./coverage ./src/**/*.map",
+    "clean": "rm -fR ./lib ./coverage",
     "start": "npm run build:live",
-    "test": "tsc && istanbul cover --print none --report json jasmine-node lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
+    "test": "tsc && istanbul cover --report json jasmine lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
   },
   "author": "jwright",
   "license": "BSD-Source-Code",
@@ -18,7 +18,6 @@
     "@types/node": "^7.0.31",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
-    "jasmine-node": "^1.14.5",
     "nodemon": "^1.11.0",
     "remap-istanbul": "^0.9.5",
     "through": "^2.3.8",
