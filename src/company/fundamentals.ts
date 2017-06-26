@@ -4,7 +4,9 @@ import {average} from '../shared';
 /**
  * Values are assumed to be in millions
  */
-export class Financials {
+export class Fundamentals {
+
+  id?: number;
 
   /**
    * Total Assets : Found on Balance Sheet

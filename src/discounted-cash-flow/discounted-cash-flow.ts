@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import {Financials} from '../company/financials';
+import {Fundamentals} from '../company/fundamentals';
 import {ForecastPeriod} from './forecast-period';
 
 /**
@@ -16,24 +16,24 @@ export class DiscountedCashFlow {
 
   /**
    *
-   * @param {Financials} financialStatement
+   * @param {Fundamentals} financialStatement
    * @param {ForecastPeriod[]|ForecastPeriod} forecastPeriods
    */
-  constructor(financials: Financials, forecastPeriods: ForecastPeriod | ForecastPeriod[],
+  constructor(fundamentals: Fundamentals, forecastPeriods: ForecastPeriod | ForecastPeriod[],
               targetNetInvestmentPercentage: number, targetOperatingCostsPercentage: number) {
-    let taxRate = financials.taxRate();
-    let discountRate = DiscountedCashFlow.discountRate(financials.equity, financials.getDebt(),
-      financials.calculateCostOfEquityCapitalAssetPricingModel(),
-      financials.simplifiedCostOfDebt(), taxRate);
+    let taxRate = fundamentals.taxRate();
+    let discountRate = DiscountedCashFlow.discountRate(fundamentals.equity, fundamentals.getDebt(),
+      fundamentals.calculateCostOfEquityCapitalAssetPricingModel(),
+      fundamentals.simplifiedCostOfDebt(), taxRate);
 
     if(!Array.isArray(forecastPeriods)) {
       forecastPeriods = [ forecastPeriods ];
     }
 
     this.discountedCashFlowValues = forecastPeriods.map(forecastPeriod => {
-      let forecastedOperatingCosts = forecastPeriod.forecastOperatingCosts(financials.operatingCostsPercentage(), targetOperatingCostsPercentage);
-      let forecastedNetInvestments = forecastPeriod.forecastNetInvestments(financials.netInvestmentPercentage(), targetNetInvestmentPercentage);
-      let forecastedChangeInWorkingCapitals = forecastPeriod.forecastChangeInWorkingCapital(financials.workingCapital(), forecastPeriod.growthRates);
+      let forecastedOperatingCosts = forecastPeriod.forecastOperatingCosts(fundamentals.operatingCostsPercentage(), targetOperatingCostsPercentage);
+      let forecastedNetInvestments = forecastPeriod.forecastNetInvestments(fundamentals.netInvestmentPercentage(), targetNetInvestmentPercentage);
+      let forecastedChangeInWorkingCapitals = forecastPeriod.forecastChangeInWorkingCapital(fundamentals.workingCapital(), forecastPeriod.growthRates);
 
       let freeCashFlows = forecastPeriod.revenues.map((revenue, index) => {
         let operatingCosts = forecastedOperatingCosts[index];
@@ -46,9 +46,9 @@ export class DiscountedCashFlow {
 
       let terminalValue = DiscountedCashFlow.terminalValue(_.last(freeCashFlows), forecastPeriod.longTermCashFlowGrowthRate, discountRate);
       let enterpriseValue = DiscountedCashFlow.enterpriseValue(freeCashFlows, terminalValue, discountRate);
-      let fairValue = DiscountedCashFlow.fairValue(enterpriseValue, financials.getDebt());
+      let fairValue = DiscountedCashFlow.fairValue(enterpriseValue, fundamentals.getDebt());
 
-      return DiscountedCashFlow.fairValuePerShare(fairValue, financials.outstandingShares);
+      return DiscountedCashFlow.fairValuePerShare(fairValue, fundamentals.outstandingShares);
     });
 
   }

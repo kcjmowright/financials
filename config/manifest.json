@@ -1,0 +1,19 @@
+{
+  "server": {
+    "app": {
+      "name": "Financials"
+    }
+  },
+  "connections": [
+    {
+      "port": 9000,
+      "labels": ["api"]
+    }
+  ],
+  "registrations": [{
+    "plugin": "./company",
+    "options": {
+      "select": ["api"]
+    }
+  }]
+}

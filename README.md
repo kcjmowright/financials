@@ -35,6 +35,13 @@ npm run start
 npm run clean
 ```
 
+#### Database Setup
+
+```
+createdb --username postgres -E UTF-8 -T template0 --no-password --locale C financials
+knex migrate:make --env development --knexfile ./src/knexfile.ts financials
+```
+
 ## Modules
 
 ### Company
@@ -47,7 +54,7 @@ npm run clean
 
 ### Feeds
 
-[README](src/feeds/README.md)
+[README](src/server/feeds/README.md)
 
 ### Indicators
 
@@ -60,3 +67,6 @@ npm run clean
 ### Shared
 
 (todo)
+
+
+

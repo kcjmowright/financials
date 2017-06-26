@@ -5,9 +5,10 @@
   "main": "lib/index",
   "types": "lib/index",
   "scripts": {
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/**/*.ts",
+    "build:live": "nodemon --exec ts-node ./lib/index.js -- ./src/**/*.ts",
     "clean": "rm -fR ./lib ./coverage",
     "start": "npm run build:live",
+    "start-server": "node lib/index.js",
     "test": "tsc && istanbul cover --report json jasmine lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
   },
   "author": "jwright",
@@ -27,7 +28,13 @@
   },
   "dependencies": {
     "csv-parse": "^1.2.0",
+    "glue": "^4.1.0",
+    "hapi": "^16.4.3",
+    "inert": "^4.2.0",
+    "knex": "^0.13.0",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "pg": "^6.2.4",
     "stream-transform": "^0.1.2",
     "through": "^2.3.8"
   }

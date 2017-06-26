@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 
 import {DiscountedCashFlow} from './discounted-cash-flow';
-import {Financials} from '../company/financials';
+import {Fundamentals} from '../company/fundamentals';
 import {ForecastPeriod} from './forecast-period';
 
 describe('Class: DiscountedCashFlow', function() {
@@ -16,11 +16,11 @@ describe('Class: DiscountedCashFlow', function() {
     expect(discountedCashFlowMock).toBeDefined();
     expect(financialsMock).toBeDefined();
 
-    this.financials = new Financials();
-    _.assign(this.financials, financialsMock);
+    this.fundamentals = new Fundamentals();
+    _.assign(this.fundamentals, financialsMock);
 
     this.forecastPeriod = new ForecastPeriod(forecastPeriodMock.revenue, forecastPeriodMock.growthRates);
-    this.discountedCashFlow = new DiscountedCashFlow(this.financials, this.forecastPeriod,
+    this.discountedCashFlow = new DiscountedCashFlow(this.fundamentals, this.forecastPeriod,
       discountedCashFlowMock.targetNetInvestmentPercentage, discountedCashFlowMock.targetOperatingCostsPercentage);
   });
 

@@ -1,0 +1,15 @@
+{
+  "development": {
+    "client": "pg",
+    "connection": {
+      "database": "financials",
+      "host" : "localhost",
+      "user" : "postgres",
+      "password" : "<your-password-here>"
+    },
+    "migrations": {
+      "directory": "lib/migrations",
+      "tableName": "migrations"
+    }
+  }
+}

@@ -1,2 +1,3 @@
 export {Company} from './company';
-export {Financials} from './financials';
+export {Fundamentals} from './fundamentals';
+export {Quote} from './quote';

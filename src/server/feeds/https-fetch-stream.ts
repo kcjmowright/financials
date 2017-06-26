@@ -7,6 +7,7 @@ export class HttpsFetchStream {
   }
 
   public get = (callback?: Function) => {
+    console.log(`Calling ${this.host}${this.path}`);
     const options = {
       host: this.host,
       port: 443,
@@ -19,13 +20,16 @@ export class HttpsFetchStream {
 
     req.on('error', (e) => {
       console.error(e);
+      if(_.isFunction(callback)) {
+        callback(e);
+      }
     });
     req.end();
   };
 
   public onResponse = (res: https.IncomingMessage, callback?: Function) => {
     if(_.isFunction(callback)) {
-      res.on('end', callback);
+      res.on('finish', callback);
     }
   }
 }
