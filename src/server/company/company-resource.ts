@@ -98,6 +98,42 @@ export class CompanyResource {
    * @return {Response}
    */
   @register('company', {
+    method: 'GET',
+    path: '/company/ticker/{ticker}'
+  })
+  public static getCompanyByTicker(request, reply): void {
+    let ticker = request.params.ticker;
+
+    let response = reply(knex('companies')
+      .where({
+        ticker: ticker.toUpperCase()
+      })
+      .select('id', 'name', 'ticker', 'sector', 'industry', 'exchange')
+      .then((resp) => {
+          if(!resp.length) {
+            response.code(404);
+            return JSON.stringify({
+              message: `Company not found.`
+            });
+          }
+          return JSON.stringify(resp[0])
+        }, (e) => {
+          console.log(e);
+          response.code(500);
+          return JSON.stringify({
+            message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+          });
+        }
+      )).type('application/json');
+  }
+
+  /**
+   *
+   * @param request
+   * @param reply
+   * @return {Response}
+   */
+  @register('company', {
     method: 'POST',
     path: '/company'
   })

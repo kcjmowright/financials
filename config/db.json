@@ -5,7 +5,7 @@
       "database": "financials",
       "host" : "localhost",
       "user" : "postgres",
-      "password" : "<your-password-here>"
+      "password" : "changeme"
     },
     "migrations": {
       "directory": "lib/migrations",
