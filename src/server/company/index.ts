@@ -1,7 +1,10 @@
+import {BalanceSheetResource} from './balance-sheet-resource';
+import {CashFlowResource} from './cash-flow-resource';
 import {CompanyResource} from './company-resource';
 import {FundamentalsResource} from './fundamentals-resource';
 import {QuoteResource} from './quote-resource';
 import {ServerRegistrations} from '../server-registrations';
+import {IncomeStatementResource} from './income-statement-resource';
 
 /**
  *
@@ -11,8 +14,11 @@ import {ServerRegistrations} from '../server-registrations';
  */
 export function register(server, options, next): void {
   ServerRegistrations.register('company', server, [
+    BalanceSheetResource,
+    CashFlowResource,
     CompanyResource,
     FundamentalsResource,
+    IncomeStatementResource,
     QuoteResource
   ]);
   next();

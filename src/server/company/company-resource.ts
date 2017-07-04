@@ -18,25 +18,32 @@ export class CompanyResource {
     path: '/company'
   })
   public static findCompanies(request, reply): void {
+    let name = request.query.name;
     let page = PageRequest.clone(request.query);
-    let response = reply(knex('companies')
+    let queryBuilder = knex('companies')
       .select('id', 'name', 'ticker', 'industry', 'sector', 'exchange')
       .limit(page.pageSize)
       .offset(page.getOffset())
-      .orderBy('name')
+      .orderBy('name');
+    let countQueryBuilder = knex('companies').count('name');
+
+    if(!!name) {
+      queryBuilder = queryBuilder.whereRaw('name like ?', [`%${name}%`]);
+      countQueryBuilder = countQueryBuilder.whereRaw('name like ?', [`%${name}%`]);
+    }
+    let response = reply(queryBuilder
       .then(
         (results) => {
-          return knex('companies').count('name').then((r) => {
-            let pageResults = new PageResults(results, +r[0].count, page.page, page.pageSize);
-
-            return JSON.stringify(pageResults);
-          }, (e) => {
-            console.log(e);
-            response.code(500);
-            return JSON.stringify({
-              message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-            });
-          });
+          return countQueryBuilder.then(
+            (r) => JSON.stringify(new PageResults(results, +r[0].count, page.page, page.pageSize)),
+            (e) => {
+              console.log(e);
+              response.code(500);
+              return JSON.stringify({
+                message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+              });
+            }
+          );
         },
         (e) => {
           console.log(e);

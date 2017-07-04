@@ -6,24 +6,14 @@ https://www.quantshare.com/sa-43-10-ways-to-download-historical-stock-quotes-dat
 
 ### Company Fundamental Data Feeds
 
-https://account.usfundamentals.com/
-http://usfundamentals.com/#section-using-api
+https://www.google.com/finance?q=[exchange:symbol]&fstype=ii
 
-Indicators available for most companies
 
-* Assets
-* AssetsCurrent
-* CashAndCashEquivalentsAtCarryingValue
-* Liabilities
-* LiabilitiesCurrent
-* NetCashProvidedByUsedInFinancingActivities (yearly only)
-* NetCashProvidedByUsedInInvestingActivities (yearly only)
-* NetCashProvidedByUsedInOperatingActivities (yearly only)
-* OperatingIncomeLoss
-* PropertyPlantAndEquipmentNet
-* Revenues
+- Balance Sheets
+- Income Statements
+- Cash Flows
 
-See [USFundamentalsStream](us-fundamentals-stream.ts)
+See [GoogleFinanceFinancialsService](google-finance-financials-service.ts)
 
 ### Stock Quote Feeds
 
@@ -31,7 +21,12 @@ https://app.quotemedia.com/quotetools/getHistoryDownload.csv?&webmasterId=501&st
 
 See [QuotemediaStream](quotemedia-stream.ts)
 
+http://www.google.com/finance/historical?q=NASDAQ%3ANVDA&output=csv
+
 ### Trade IT
+
+Proxy API to brokerage web sites and APIs.
+
 https://www.trade.it/
 
 ### Nasdaq
@@ -41,6 +36,22 @@ List of companies
 http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=AMEX&render=download
 http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NYSE&render=download
 http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NASDAQ&render=download
+
+Fundamentals
+
+HTML only
+
+http://www.nasdaq.com/symbol/{ticker}/financials?query=income-statement
+http://www.nasdaq.com/symbol/{ticker}/financials?query=income-statement&data=quarterly
+http://www.nasdaq.com/symbol/{ticker}/financials?query=balance-sheet
+http://www.nasdaq.com/symbol/{ticker}/financials?query=cash-flow
+http://www.nasdaq.com/symbol/{ticker}/financials?query=ratios
+
+```
+$('form[action="./financials?symbol=PIH&selected=PIH&query=ratios"] .genTable  h3').text().trim()
+$('form[action="./financials?symbol=PIH&selected=PIH&query=ratios"] .genTable tr')
+$('form[action="./financials?symbol=PIH&selected=PIH&query=ratios"] .genTable tr').text().split('\n').forEach(function(x) { console.log(x.trim()); });
+```
 
 Earnings report
 http://www.nasdaq.com/earnings/report/{ticker}

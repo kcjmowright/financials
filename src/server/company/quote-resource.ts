@@ -218,8 +218,14 @@ export class QuoteResource {
             }
             return JSON.stringify({
               ticker: ticker,
-              average: avg,
-              volumes: results.rows
+              averagePrice: avg,
+              prices: results.rows.map(row => {
+                return {
+                  date: DateUtil.toISODateTimeString(row.date),
+                  close: row.close,
+                  percentChange: row.percentchange
+                };
+              })
             });
           }, (e) => {
             console.log(e);
@@ -295,8 +301,14 @@ export class QuoteResource {
             }
             return JSON.stringify({
               ticker: ticker,
-              average: avg,
-              volumes: results.rows
+              averageVolume: avg,
+              volumes: results.rows.map(row => {
+                return {
+                  date: DateUtil.toISODateTimeString(row.date),
+                  volume: row.volume,
+                  percentChange: row.percentchange
+                };
+              })
             });
           }, (e) => {
             console.log(e);

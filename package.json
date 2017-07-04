@@ -27,6 +27,8 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.1",
+    "cookie-parse": "^0.4.0",
     "csv-parse": "^1.2.0",
     "glue": "^4.1.0",
     "hapi": "^16.4.3",
