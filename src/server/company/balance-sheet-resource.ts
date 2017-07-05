@@ -17,11 +17,12 @@ export class BalanceSheetResource {
   })
   public static findBalanceSheets(request, reply): void {
     let symbol = request.query.symbol;
-    let page = PageRequest.clone(request.query);
+    let page = PageRequest.newPageRequest(request.query);
     let queryBuilder = knex('balancesheets').select('*');
     let countQuery = knex('balancesheets').count('id');
 
     if(!!symbol) {
+      symbol = symbol.toUpperCase();
       queryBuilder = queryBuilder.where({
         symbol: symbol
       });

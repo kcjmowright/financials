@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import {average, Line} from '../shared';
+import {average, Line} from '../math';
 import {FailureSwing} from './failure-swing';
 
 /**

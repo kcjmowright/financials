@@ -17,11 +17,12 @@ export class IncomeStatementResource {
   })
   public static findIncomeStatements(request, reply): void {
     let symbol = request.query.symbol;
-    let page = PageRequest.clone(request.query);
+    let page = PageRequest.newPageRequest(request.query);
     let queryBuilder = knex('incomestatements').select('*');
     let countQuery = knex('incomestatements').count('id');
 
     if(!!symbol) {
+      symbol = symbol.toUpperCase();
       queryBuilder = queryBuilder.where({
         symbol: symbol
       });

@@ -1,12 +1,14 @@
-import * as moment from 'moment';
 import {knex} from '../db';
 import {DateUtil, PageRequest, PageResults} from '../../shared';
 import {Promise} from 'bluebird';
 import {Quote} from '../../company';
-import {QuotemediaStream} from '../feeds';
 import register from '../server-register.decorator';
+import {QuotemediaQuoteService} from '../feeds/quotemedia-quote-service';
+import {QuoteService} from './quote-service';
 
 export class QuoteResource {
+
+  static quoteService = new QuoteService(knex);
 
   /**
    *
@@ -21,83 +23,28 @@ export class QuoteResource {
     let startDate = request.query.startDate;
     let endDate = request.query.endDate;
     let ticker = request.params.ticker;
-    let page = PageRequest.clone(request.query);
+    let page = PageRequest.newPageRequest(request.query);
 
     if(!ticker) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, ticker is not valid.`
-      })).code(400);
+      }).code(400).type('application/json');
       return;
     }
-
-    let queryBuilder = knex('quotes').where({
-      ticker: ticker.toUpperCase()
-    });
-    if(!!startDate) {
-      if(!endDate) {
-        endDate = new Date();
-      }
-      queryBuilder = queryBuilder.whereBetween('date', [ startDate, endDate ]);
-    }
-
-    let response = reply(queryBuilder
-      .select('id', 'ticker', 'date', 'open', 'high', 'low',
-        'close', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
-      .orderBy('date')
-      .offset(page.getOffset())
-      .limit(page.pageSize)
-      .then(
-        (results) => {
-          if(!results.length) {
-            response.code(404);
-            return JSON.stringify({
-              message: `ticker not found`
-            });
+    let response = reply(QuoteResource.quoteService.findQuotes(ticker, startDate, endDate, page).catch((quotes) => {
+        if(!quotes) {
+          response.code(404);
+          return {
+            message: `Quotes not found.`
           }
-          let list = results.map((r) => {
-            let quote = new Quote();
-
-            quote.id = r.id;
-            quote.ticker = r.ticker;
-            quote.date = DateUtil.toISODateTimeString(r.date);
-            quote.open = r.open;
-            quote.high = r.high;
-            quote.low = r.low;
-            quote.close = r.close;
-            quote.volume = r.volume;
-            quote.changed = r.changed;
-            quote.changep = r.changep;
-            quote.adjclose = r.adjclose;
-            quote.tradeval = r.tradeval;
-            quote.tradevol = r.tradevol;
-            return quote;
-          });
-          let countQuery = knex('quotes').count('id').where({
-            ticker: ticker.toUpperCase()
-          });
-          if(!!startDate) {
-            countQuery = countQuery.whereBetween('date', [ startDate, endDate ]);
-          }
-          return countQuery.then((r) => {
-            let pageResult = new PageResults(list, r[0].count, page.page, page.pageSize);
-
-            return JSON.stringify(pageResult);
-          }, (e) => {
-            console.log(e);
-            response.code(500);
-            return JSON.stringify({
-              message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-            });
-          })
-        },
-        (e) => {
-          console.log(e);
-          response.code(500);
-          return JSON.stringify({
-            message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-          });
         }
-      )).type('application/json');
+        return quotes;
+      }, e => {
+        response.code(500);
+        return {
+          message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+        };
+      })).type('application/json');
   }
 
   /**
@@ -118,46 +65,20 @@ export class QuoteResource {
       })).code(400);
       return;
     }
-
-    let response = reply(knex('quotes')
-      .where({
-        ticker: ticker.toUpperCase()
-      })
-      .select('id', 'ticker', 'date', 'open', 'high', 'low',
-        'close', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
-      .orderBy('date', 'desc')
-      .limit(1)
-      .then((result) => {
-        if(!result.length) {
-          response.code(404);
-          return JSON.stringify({
-            message: `Quote not found.`
-          });
-        }
-        let quote = new Quote();
-        let r = result[0];
-
-        quote.id = r.id;
-        quote.ticker = r.ticker;
-        quote.date = DateUtil.toISODateTimeString(r.date);
-        quote.open = r.open;
-        quote.high = r.high;
-        quote.low = r.low;
-        quote.close = r.close;
-        quote.volume = r.volume;
-        quote.changed = r.changed;
-        quote.changep = r.changep;
-        quote.adjclose = r.adjclose;
-        quote.tradeval = r.tradeval;
-        quote.tradevol = r.tradevol;
-        return JSON.stringify(quote);
-      }, (e) => {
-        console.log(e);
-        response.code(500);
-        return JSON.stringify({
-          message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
-      })).type('application/json');
+    let response = reply(QuoteResource.quoteService.getQuote(ticker).then((q) => {
+      if(!q) {
+        response.code(404);
+        return {
+          message: 'Quote not found'
+        };
+      }
+      return q;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
   }
 
   /**
@@ -166,81 +87,41 @@ export class QuoteResource {
    * @param reply
    */
   @register('company', {
-    path: '/quote/{ticker}/average-price/{period}',
+    path: '/quote/{symbol}/average-price/{period}',
     method: 'GET'
   })
   public static getAverageClosingPrice(request, reply): void {
-    let ticker = request.params.ticker;
+    let symbol = request.params.symbol;
     let period = parseInt(request.params.period);
 
-    if(!ticker) {
-      reply(JSON.stringify({
-        message: `Malformed request, ticker is not valid.`
-      })).code(400);
+    if(!symbol) {
+      reply({
+        message: `Malformed request, ticker symbol is not valid.`
+      }).type('application/json').code(400);
       return;
     }
-    ticker = ticker.toUpperCase();
 
     if(!period || isNaN(period) || period <= 0) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, period is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
-    let periodEntries = knex('quotes')
-      .where({
-        ticker: ticker
-      })
-      .select('close')
-      .orderBy('date', 'desc')
-      .limit(period)
-      .as('period_entries');
-    let response = reply(knex.from(periodEntries)
-      .avg('close')
-      .then((results) => {
-        if(!results.length) {
-          response.code(404);
-          return JSON.stringify({
-            message: `Quote not found.`
-          });
-        }
-        let avg = results[0].avg;
 
-        return knex
-          .raw(`select date, close, close::decimal/${avg} as percentchange ` +
-            `from quotes where ticker = ? order by date desc limit ?`, [ticker, period])
-          .then((results) => {
-            if(!results.rows.length) {
-              response.code(404);
-              return JSON.stringify({
-                message: `Quote not found.`
-              });
-            }
-            return JSON.stringify({
-              ticker: ticker,
-              averagePrice: avg,
-              prices: results.rows.map(row => {
-                return {
-                  date: DateUtil.toISODateTimeString(row.date),
-                  close: row.close,
-                  percentChange: row.percentchange
-                };
-              })
-            });
-          }, (e) => {
-            console.log(e);
-            response.code(500);
-            return JSON.stringify({
-              message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-            });
-          });
-      }, (e) => {
-        console.log(e);
-        response.code(500);
-        return JSON.stringify({
-          message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
-      })).type('application/json');
+    let response = reply(QuoteResource.quoteService.getAverageClosingPrice(symbol, period).then(cp => {
+      if(!cp) {
+        response.code(404);
+        return {
+          message: 'Quote not found'
+        };
+      }
+      return cp;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
   }
 
   /**
@@ -249,20 +130,93 @@ export class QuoteResource {
    * @param reply
    */
   @register('company', {
-    path: '/quote/{ticker}/average-volume/{period}',
+    path: '/quote/{symbol}/average-volume/{period}',
     method: 'GET'
   })
   public static getAverageVolume(request, reply): void {
-    let ticker = request.params.ticker;
+    let symbol = request.params.symbol;
     let period = parseInt(request.params.period);
 
-    if(!ticker) {
+    if(!symbol) {
       reply(JSON.stringify({
         message: `Malformed request, ticker is not valid.`
       })).code(400);
       return;
     }
-    ticker = ticker.toUpperCase();
+    if(!period || isNaN(period) || period <= 0) {
+      reply(JSON.stringify({
+        message: `Malformed request, period is not valid.`
+      })).code(400);
+      return;
+    }
+    let response = reply(QuoteResource.quoteService.getAverageVolume(symbol, period).then(volume => {
+      if(!volume) {
+        response.code(404);
+        return {
+          message: 'Quote not found'
+        };
+      }
+      return volume;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
+  }
+
+  /**
+   *
+   * @param request
+   * @param reply
+   */
+  @register('company', {
+    path: '/quote/{symbol}/average-volume-price/{period}',
+    method: 'GET'
+  })
+  public static getAverageVolumeAndPrice(request, reply): void {
+    let symbol = request.params.symbol;
+    let period = parseInt(request.params.period);
+
+    if(!symbol) {
+      reply(JSON.stringify({
+        message: `Malformed request, ticker is not valid.`
+      })).code(400);
+      return;
+    }
+    if(!period || isNaN(period) || period <= 0) {
+      reply(JSON.stringify({
+        message: `Malformed request, period is not valid.`
+      })).code(400);
+      return;
+    }
+    let response = reply(QuoteResource.quoteService.getAverageVolumeAndPriceWithRatios(symbol, period).then(volume => {
+      if(!volume) {
+        response.code(404);
+        return {
+          message: 'Quote not found'
+        };
+      }
+      return volume;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
+  }
+
+  /**
+   *
+   * @param request
+   * @param reply
+   */
+  @register('company', {
+    path: '/quote/top-price-movers/{period}',
+    method: 'GET'
+  })
+  public static getTopPriceMovers(request, reply): void {
+    let period = parseInt(request.params.period);
 
     if(!period || isNaN(period) || period <= 0) {
       reply(JSON.stringify({
@@ -270,60 +224,54 @@ export class QuoteResource {
       })).code(400);
       return;
     }
-    let periodEntries = knex('quotes')
-      .where({
-        ticker: ticker
-      })
-      .select('volume')
-      .orderBy('date', 'desc')
-      .limit(period)
-      .as('period_entries');
-    let response = reply(knex.from(periodEntries)
-      .avg('volume')
-      .then((results) => {
-        if(!results.length) {
-          response.code(404);
-          return JSON.stringify({
-            message: `Quote not found.`
-          });
-        }
-        let avg = results[0].avg;
+    let response = reply(QuoteResource.quoteService.getTopPriceMovers(period).then(topMovers => {
+      if(!topMovers) {
+        response.code(404);
+        return {
+          message: 'Top movers not found'
+        };
+      }
+      return topMovers;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
+  }
 
-        return knex
-          .raw(`select date, volume, volume::decimal/${avg} as percentchange ` +
-            `from quotes where ticker = ? order by date desc limit ?`, [ticker, period])
-          .then((results) => {
-            if(!results.rows.length) {
-              response.code(404);
-              return JSON.stringify({
-                message: `Quote not found.`
-              });
-            }
-            return JSON.stringify({
-              ticker: ticker,
-              averageVolume: avg,
-              volumes: results.rows.map(row => {
-                return {
-                  date: DateUtil.toISODateTimeString(row.date),
-                  volume: row.volume,
-                  percentChange: row.percentchange
-                };
-              })
-            });
-          }, (e) => {
-            console.log(e);
-            response.code(500);
-            return JSON.stringify({
-              message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-            });
-          });
-      }, (e) => {
-        console.log(e);
-        response.code(500);
-        return JSON.stringify({
-          message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
-      })).type('application/json');
+  /**
+   *
+   * @param request
+   * @param reply
+   */
+  @register('company', {
+    path: '/quote/top-volume-movers/{period}',
+    method: 'GET'
+  })
+  public static getTopVolumeMovers(request, reply): void {
+    let period = parseInt(request.params.period);
+
+    if(!period || isNaN(period) || period <= 0) {
+      reply(JSON.stringify({
+        message: `Malformed request, period is not valid.`
+      })).code(400);
+      return;
+    }
+    let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period).then(topMovers => {
+      if(!topMovers) {
+        response.code(404);
+        return {
+          message: 'Top movers not found'
+        };
+      }
+      return topMovers;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
   }
 
   /**
@@ -336,37 +284,19 @@ export class QuoteResource {
     method: 'POST'
   })
   public static createQuote(request, reply): void {
-    let quote: Quote = request.payload;
+    let quote: Quote = Quote.newInstance(request.payload);
 
-    if(!quote.ticker) {
+    if(!quote || !quote.ticker) {
       reply(JSON.stringify({
-        message: `expected valid ticker`
+        message: 'Expected quote with a valid ticker'
       })).code(400);
       return;
     }
-
-    let response = reply(knex('quotes').returning('id').insert({
-      ticker: quote.ticker.toUpperCase(),
-      date: DateUtil.toDateTime(quote.date),
-      open: quote.open,
-      high: quote.high,
-      low: quote.low,
-      close: quote.close,
-      volume: quote.volume,
-      changed: quote.changed,
-      changep: quote.changep,
-      adjclose: quote.adjclose,
-      tradeval: quote.tradeval,
-      tradevol: quote.tradevol
-    }).then((resp) => {
-      quote.id = resp[0];
-      return JSON.stringify(quote);
-    }, (e) => {
-      console.log(e);
+    let response = reply(QuoteResource.quoteService.createQuote(quote).then(q => q, e => {
       response.code(500);
-      return JSON.stringify({
+      return {
         message: `Error: ${!!e.detail ? e.message : e.detail}.  See log for details.`
-      });
+      };
     })).type('application/json');
   }
 
@@ -380,7 +310,7 @@ export class QuoteResource {
     method: 'PUT'
   })
   public static updateQuote(request, reply): void {
-    let quote = request.payload;
+    let quote = Quote.newInstance(request.payload);
 
     if(!quote.id || isNaN(+quote.id)) {
       reply(JSON.stringify({
@@ -388,30 +318,11 @@ export class QuoteResource {
       })).code(400);
       return;
     }
-    let response = reply(knex('quotes').where({
-      id: quote.id
-    }).update({
-      ticker: quote.ticker.toUpperCase(),
-      date: DateUtil.toDateTime(quote.date),
-      open: quote.open,
-      high: quote.high,
-      low: quote.low,
-      close: quote.close,
-      volume: quote.volume,
-      changed: quote.changed,
-      changep: quote.changep,
-      adjclose: quote.adjclose,
-      tradeval: quote.tradeval,
-      tradevol: quote.tradevol
-    }).then(() => {
-      response.code(204);
-      return;
-    }, (e) => {
-      console.log(e);
+    let response = reply(QuoteResource.quoteService.updateQuote(quote).then(() => response.code(204), e => {
       response.code(500);
-      return JSON.stringify({
-        message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-      });
+      return {
+        message: `Error: ${!!e.detail ? e.message : e.detail}.  See log for details.`
+      };
     })).type('application/json');
   }
 
@@ -424,7 +335,7 @@ export class QuoteResource {
     path: '/quote/{id}',
     method: 'DELETE'
   })
-  public static removeQuotes(request, reply): void {
+  public static removeQuote(request, reply): void {
     let id = request.params.id;
 
     if (isNaN(+id)) {
@@ -433,10 +344,7 @@ export class QuoteResource {
       })).code(400);
       return;
     }
-
-    let response = reply(knex('quotes').where({
-      id: +id
-    }).del().then(() => {
+    let response = reply(QuoteResource.quoteService.removeQuote(id).then(() => {
       response.code(204);
       return;
     }, (e) => {
@@ -458,65 +366,12 @@ export class QuoteResource {
     method: 'PUT'
   })
   public static populateQuotes(request, reply) {
-    let endDate = new Date();
+    let symbol = request.query.symbol;
 
-    new Promise((resolve, reject) => {
-      knex.select('companies.ticker')
-        .max('quotes.date')
-        .from('companies')
-        .leftOuterJoin('quotes', 'companies.ticker', 'quotes.ticker')
-        .groupBy('companies.ticker')
-        .orderBy('companies.ticker')
-        .then((results) => {
-          let calls = results.map((result) => futureCall(result.ticker, result.date));
-
-          chain(calls, 0);
-        }, (e) => {
-          reject(e);
-        });
-
-      /**
-       *
-       * @param calls
-       * @param index
-       * @private
-       */
-      function chain(calls, index): Promise {
-        if(index >= calls.length) {
-          resolve();
-        } else {
-          calls[index]().then(() => chain(calls, index + 1), (e) => {
-            console.log(`Error : ${e.message}`);
-            chain(calls, index + 1);
-          })
-        }
-      }
-    }).then(
+    new QuotemediaQuoteService(knex).fetchQuotes(symbol).then(
       () => console.log('Done populating quotes.'),
-      e => console.log(`Error populating quotes: ${e.message}`)
+      e => console.log(`Error populating quotes: ${e.message} ${e}`)
     );
-
-    reply().code(202);
-
-    function futureCall(ticker: string, date?: Date) {
-      return function() {
-        return new Promise((resolve, reject) => {
-          let startDate = !!date ? moment(date).add(1, 'day').toDate() : moment('2012-01-01').toDate();
-          if(moment(startDate).isAfter(moment(endDate))) {
-            return resolve();
-          }
-
-          console.log(`ticker: ${ticker}, startDate: ${startDate}, endDate: ${endDate}`);
-          new QuotemediaStream(ticker, startDate, endDate, knex).get((e) => {
-            if(!!e) {
-              console.log(e);
-              resolve();
-              return;
-            }
-            resolve();
-          });
-        });
-      }
-    }
+    reply().code(204);
   }
 }

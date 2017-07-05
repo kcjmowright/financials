@@ -9,7 +9,7 @@ export class PageRequest {
     return (this.page - 1) * this.pageSize;
   }
 
-  static clone(options: any): PageRequest {
+  static newPageRequest(options: any): PageRequest {
     let page = new PageRequest();
 
     page.page = !!options.page ? +options.page : PageRequest.DEFAULT_PAGE;

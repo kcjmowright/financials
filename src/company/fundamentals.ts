@@ -1,5 +1,5 @@
 import {Company} from './company';
-import {average} from '../shared';
+import {average} from '../math';
 
 /**
  * Values are assumed to be in millions

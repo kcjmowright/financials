@@ -17,11 +17,12 @@ export class CashFlowResource {
   })
   public static findCashFlows(request, reply): void {
     let symbol = request.query.symbol;
-    let page = PageRequest.clone(request.query);
+    let page = PageRequest.newPageRequest(request.query);
     let queryBuilder = knex('cashflows').select('*');
     let countQuery = knex('cashflows').count('id');
 
     if(!!symbol) {
+      symbol = symbol.toUpperCase();
       queryBuilder = queryBuilder.where({
         symbol: symbol
       });

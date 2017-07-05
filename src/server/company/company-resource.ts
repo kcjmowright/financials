@@ -19,7 +19,7 @@ export class CompanyResource {
   })
   public static findCompanies(request, reply): void {
     let name = request.query.name;
-    let page = PageRequest.clone(request.query);
+    let page = PageRequest.newPageRequest(request.query);
     let queryBuilder = knex('companies')
       .select('id', 'name', 'ticker', 'industry', 'sector', 'exchange')
       .limit(page.pageSize)
