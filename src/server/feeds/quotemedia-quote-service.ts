@@ -12,28 +12,26 @@ export class QuotemediaQuoteService {
   /**
    *
    * @param {string} [symbol]
+   * @param {Date} [startDate=1 year ago]
    * @return {Promise}
    */
-  public fetchQuotes(symbol?: string): Promise {
+  public fetchQuotes(symbol?: string, startDate: Date = moment().subtract(1, 'year').toDate()): Promise {
     let endDate = new Date();
     let knex = this.knex;
 
     return new Promise((resolve, reject) => {
-      let queryBuilder = knex.select('companies.ticker')
-        .max('quotes.date')
-        .from('companies')
-        .leftOuterJoin('quotes', 'companies.ticker', 'quotes.ticker');
+      let queryBuilder = knex.select('ticker')
+        .from('companies');
 
       if(!!symbol) {
         queryBuilder = queryBuilder.where({
-          'companies.ticker': symbol
+          'ticker': symbol
         });
       }
       queryBuilder
-        .groupBy('companies.ticker')
-        .orderBy('companies.ticker', 'desc')
+        .orderBy('ticker', 'asc')
         .then((results) => {
-          let calls = results.map((result) => futureCall(result.ticker, result.date));
+          let calls = results.map((result) => futureCall(result.ticker));
 
           chain(calls, 0);
         }, (e) => reject(e));
@@ -59,23 +57,15 @@ export class QuotemediaQuoteService {
     /**
      * @private
      * @param ticker
-     * @param date
      * @return {()=>any}
      */
-    function futureCall(ticker: string, date?: Date) {
+    function futureCall(ticker: string) {
       return function() {
         return new Promise((resolve, reject) => {
-          let startDate = !!date ? moment(date).add(1, 'day').toDate() : moment('2012-01-01').toDate();
-
-          if(moment(startDate).isAfter(moment(endDate))) {
-            return resolve();
-          }
-
           console.log(`ticker: ${ticker}, startDate: ${startDate}, endDate: ${endDate}`);
           new QuotemediaStream(ticker, startDate, endDate, knex).get((e) => {
             if(!!e) {
-              console.log(e);
-              return resolve();
+              console.log(e.message);
             }
             resolve();
           });

@@ -1,8 +1,8 @@
 import {knex} from '../db';
-import {DateUtil, PageRequest, PageResults} from '../../shared';
+import {DateUtil, PageRequest} from '../../shared';
 import {Promise} from 'bluebird';
 import {Quote} from '../../company';
-import register from '../server-register.decorator';
+import Route from '../route.decorator';
 import {QuotemediaQuoteService} from '../feeds/quotemedia-quote-service';
 import {QuoteService} from './quote-service';
 
@@ -15,7 +15,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{ticker}',
     method: 'GET'
   })
@@ -32,19 +32,19 @@ export class QuoteResource {
       return;
     }
     let response = reply(QuoteResource.quoteService.findQuotes(ticker, startDate, endDate, page).catch((quotes) => {
-        if(!quotes) {
-          response.code(404);
-          return {
-            message: `Quotes not found.`
-          }
-        }
-        return quotes;
-      }, e => {
-        response.code(500);
+      if(!quotes) {
+        response.code(404);
         return {
-          message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-        };
-      })).type('application/json');
+          message: `Quotes not found.`
+        }
+      }
+      return quotes;
+    }, e => {
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
   }
 
   /**
@@ -52,7 +52,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{ticker}/latest',
     method: 'GET'
   })
@@ -60,9 +60,9 @@ export class QuoteResource {
     let ticker = request.params.ticker;
 
     if(!ticker) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, ticker is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.getQuote(ticker).then((q) => {
@@ -86,7 +86,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{symbol}/average-price/{period}',
     method: 'GET'
   })
@@ -129,7 +129,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{symbol}/average-volume/{period}',
     method: 'GET'
   })
@@ -138,15 +138,15 @@ export class QuoteResource {
     let period = parseInt(request.params.period);
 
     if(!symbol) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, ticker is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     if(!period || isNaN(period) || period <= 0) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, period is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.getAverageVolume(symbol, period).then(volume => {
@@ -170,7 +170,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{symbol}/average-volume-price/{period}',
     method: 'GET'
   })
@@ -179,25 +179,25 @@ export class QuoteResource {
     let period = parseInt(request.params.period);
 
     if(!symbol) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, ticker is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     if(!period || isNaN(period) || period <= 0) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, period is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
-    let response = reply(QuoteResource.quoteService.getAverageVolumeAndPriceWithRatios(symbol, period).then(volume => {
-      if(!volume) {
+    let response = reply(QuoteResource.quoteService.getAverageVolumeAndPriceWithRatios(symbol, period).then(result => {
+      if(!result) {
         response.code(404);
         return {
           message: 'Quote not found'
         };
       }
-      return volume;
+      return result;
     }, e => {
       response.code(500);
       return {
@@ -211,7 +211,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/top-price-movers/{period}',
     method: 'GET'
   })
@@ -219,9 +219,9 @@ export class QuoteResource {
     let period = parseInt(request.params.period);
 
     if(!period || isNaN(period) || period <= 0) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, period is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.getTopPriceMovers(period).then(topMovers => {
@@ -245,7 +245,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/top-volume-movers/{period}',
     method: 'GET'
   })
@@ -253,9 +253,9 @@ export class QuoteResource {
     let period = parseInt(request.params.period);
 
     if(!period || isNaN(period) || period <= 0) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, period is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period).then(topMovers => {
@@ -279,7 +279,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote',
     method: 'POST'
   })
@@ -287,9 +287,9 @@ export class QuoteResource {
     let quote: Quote = Quote.newInstance(request.payload);
 
     if(!quote || !quote.ticker) {
-      reply(JSON.stringify({
+      reply({
         message: 'Expected quote with a valid ticker'
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.createQuote(quote).then(q => q, e => {
@@ -305,7 +305,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote',
     method: 'PUT'
   })
@@ -313,9 +313,9 @@ export class QuoteResource {
     let quote = Quote.newInstance(request.payload);
 
     if(!quote.id || isNaN(+quote.id)) {
-      reply(JSON.stringify({
+      reply({
         message: `expected valid id`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.updateQuote(quote).then(() => response.code(204), e => {
@@ -331,7 +331,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/{id}',
     method: 'DELETE'
   })
@@ -339,21 +339,21 @@ export class QuoteResource {
     let id = request.params.id;
 
     if (isNaN(+id)) {
-      reply(JSON.stringify({
+      reply({
         message: `Malformed request, id is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
     let response = reply(QuoteResource.quoteService.removeQuote(id).then(() => {
       response.code(204);
       return;
-    }, (e) => {
+    }, e => {
       console.log(e);
       response.code(500);
-      return JSON.stringify({
+      return {
         message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-      });
-    }));
+      };
+    })).type('application/json');
   }
 
   /**
@@ -361,14 +361,18 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/quote/populate',
     method: 'PUT'
   })
   public static populateQuotes(request, reply) {
     let symbol = request.query.symbol;
+    let startDate = request.query.startDate;
 
-    new QuotemediaQuoteService(knex).fetchQuotes(symbol).then(
+    if(!!startDate) {
+      startDate = DateUtil.toDateTime(startDate);
+    }
+    new QuotemediaQuoteService(knex).fetchQuotes(symbol, startDate).then(
       () => console.log('Done populating quotes.'),
       e => console.log(`Error populating quotes: ${e.message} ${e}`)
     );

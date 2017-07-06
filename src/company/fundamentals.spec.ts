@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as _ from 'lodash';
 
-import {average} from '../shared';
+import {average} from '../math';
 import {Fundamentals} from './fundamentals';
 
 describe('Class: Fundamentals', function() {

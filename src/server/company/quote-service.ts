@@ -222,13 +222,18 @@ export class QuoteService {
     if(isNaN(period) || period <= 0) {
       period = 22;
     }
-    return this.knex.raw(`with 
-    last_x as (select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}),
-    ticker_with_avg_close as (select q.ticker, avg(q.close) as avg_close from quotes q where q.date between (select min(date) from last_x) 
-      and CURRENT_DATE group by q.ticker)
+    return this.knex.raw(`with last_x as (
+      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit :period
+    ),
+    ticker_with_avg_close as (
+      select q.ticker, avg(q.close) as avg_close 
+      from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
+    )
     select q.ticker, q.date, q.close, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio 
     from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close > 0 AND q.date 
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`).then(result => {
+    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
+      period: period
+    }).then(result => {
       if(!result.rows.length) {
         return null;
       }
@@ -248,13 +253,18 @@ export class QuoteService {
     if(isNaN(period) || period <= 0) {
       period = 22;
     }
-    return this.knex.raw(`with 
-    last_x as (select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}),
-    ticker_with_avg_volume as (select q.ticker, avg(q.volume) as avg_volume from quotes q where q.date between (select min(date) from last_x) 
-      and CURRENT_DATE group by q.ticker)
+    return this.knex.raw(`with last_x as (
+      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit :period
+    ),
+    ticker_with_avg_volume as (
+      select q.ticker, avg(q.volume) as avg_volume 
+      from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
+    )
     select q.ticker, q.date, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio 
     from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where a.avg_volume > 0 AND q.date 
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`).then(result => {
+    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
+      period: period
+    }).then(result => {
       if(!result.rows.length) {
         return null;
       }
@@ -267,8 +277,10 @@ export class QuoteService {
 
 
   /**
-   * @param {string} symbol
-   * @param {number} [period=22]
+   * Get the average volume and average price for a given ticker symbol and period in days and compare the volume and price to their averages.
+   *
+   * @param {string} symbol Ticker symbol.
+   * @param {number} [period=22] Number of days.
    * @return {Promise<any>}
    */
   public getAverageVolumeAndPriceWithRatios(symbol: string, period: number = 22): Promise<any> {
@@ -280,16 +292,16 @@ export class QuoteService {
     }
     return this.knex.raw(
       `with last_x as (
-        select q.date as date from quotes q where ticker = 'PRAN' order by q.date desc limit 22
+        select q.date as date from quotes q where ticker = :symbol order by q.date desc limit :period
       ),
       ticker_with_avg_close as (
         select q.ticker, avg(q.close) as avg_close from quotes q 
-        where q.ticker = 'PRAN' and q.date between (select min(date) from last_x) 
+        where q.ticker = :symbol and q.date between (select min(date) from last_x) 
         AND CURRENT_DATE group by q.ticker order by avg_close desc
       ),
       ticker_with_avg_volume as (
         select q.ticker, avg(q.volume) as avg_volume from quotes q 
-        where q.ticker = 'PRAN' and q.date between (select min(date) from last_x) 
+        where q.ticker = :symbol and q.date between (select min(date) from last_x) 
         AND CURRENT_DATE group by q.ticker order by avg_volume desc
       )
       select q.ticker, q.date, q.close, q.volume, av.avg_volume, ac.avg_close,
@@ -297,15 +309,28 @@ export class QuoteService {
         from quotes q 
         inner join ticker_with_avg_volume av on q.ticker = av.ticker 
         inner join ticker_with_avg_close ac on av.ticker = ac.ticker
-        where q.date in (select last_x.date from last_x) order by q.date desc`)
+        where q.date in (select last_x.date from last_x) order by q.date desc`, {
+        symbol: symbol,
+        period: period
+      })
       .then(result => {
         if(!result.rows.length) {
           return null;
         }
         return {
-          symbol: symbol,
+          averagePrice: result.rows[0].avg_close,
+          averageVolume: result.rows[0].avg_volume,
+          quotes: result.rows.map(row => {
+            return {
+              date: DateUtil.toISODateTimeString(row.date),
+              price: row.close,
+              priceRatio: row.closeratio,
+              volume: row.volume,
+              volumeRatio: row.volumeratio
+            };
+          }),
           period: period,
-          quotes: result.rows
+          symbol: symbol
         };
       });
   }

@@ -9,7 +9,7 @@ describe('Class: DiscountedCashFlow', function() {
 
   const forecastPeriodMock = JSON.parse(fs.readFileSync('src/discounted-cash-flow/forecast-period.mock.json', 'utf8'));
   const discountedCashFlowMock = JSON.parse(fs.readFileSync('src/discounted-cash-flow/discounted-cash-flow.mock.json', 'utf8'));
-  const financialsMock = JSON.parse(fs.readFileSync('src/company/financials.mock.json', 'utf8'));
+  const financialsMock = JSON.parse(fs.readFileSync('src/company/fundamentals.mock.json', 'utf8'));
 
   beforeEach(function() {
     expect(forecastPeriodMock).toBeDefined();

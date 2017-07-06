@@ -3,7 +3,7 @@ import {Company} from '../../company';
 import {PageRequest, PageResults} from '../../shared';
 import {NasdaqCompaniesStream} from '../feeds';
 import {Promise} from 'bluebird';
-import register from '../server-register.decorator';
+import Route from '../route.decorator';
 
 export class CompanyResource {
 
@@ -13,7 +13,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @register('company', {
+  @Route('company', {
     method: 'GET',
     path: '/company'
   })
@@ -61,7 +61,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @register('company', {
+  @Route('company', {
     method: 'GET',
     path: '/company/{id}'
   })
@@ -104,7 +104,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @register('company', {
+  @Route('company', {
     method: 'GET',
     path: '/company/ticker/{ticker}'
   })
@@ -140,7 +140,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @register('company', {
+  @Route('company', {
     method: 'POST',
     path: '/company'
   })
@@ -174,7 +174,7 @@ export class CompanyResource {
    * @param reply
    * @return {any}
    */
-  @register('company', {
+  @Route('company', {
     method: 'PUT',
     path: '/company'
   })
@@ -220,7 +220,7 @@ export class CompanyResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     method: 'DELETE',
     path: '/company/{id}'
   })
@@ -256,7 +256,7 @@ export class CompanyResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     method: 'PUT',
     path: '/company/populate'
   })

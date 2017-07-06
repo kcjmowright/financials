@@ -1,8 +1,6 @@
 import {knex} from '../db';
-import {Company, Fundamentals} from '../../company';
 import {PageRequest, PageResults} from '../../shared';
-import register from '../server-register.decorator';
-import {GoogleFinanceFinancialsService} from '../feeds';
+import Route from '../route.decorator';
 
 export class BalanceSheetResource {
 
@@ -11,7 +9,7 @@ export class BalanceSheetResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/balance-sheet',
     method: 'GET'
   })
@@ -63,7 +61,7 @@ export class BalanceSheetResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/balance-sheet/{id}',
     method: 'GET'
   })

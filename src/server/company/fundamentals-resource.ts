@@ -1,5 +1,5 @@
 import {knex} from '../db';
-import register from '../server-register.decorator';
+import Route from '../route.decorator';
 import {GoogleFinanceFinancialsService} from '../feeds';
 
 export class FundamentalsResource {
@@ -9,7 +9,7 @@ export class FundamentalsResource {
    * @param request
    * @param reply
    */
-  @register('company', {
+  @Route('company', {
     path: '/fundamentals',
     method: 'PUT'
   })
