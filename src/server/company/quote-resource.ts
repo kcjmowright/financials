@@ -2,9 +2,9 @@ import {knex} from '../db';
 import {DateUtil, PageRequest} from '../../shared';
 import {Promise} from 'bluebird';
 import {Quote} from '../../company';
-import Route from '../route.decorator';
 import {QuotemediaQuoteService} from '../feeds/quotemedia-quote-service';
 import {QuoteService} from './quote-service';
+import Route from '../route.decorator';
 
 export class QuoteResource {
 
@@ -15,7 +15,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{ticker}',
     method: 'GET'
   })
@@ -52,7 +52,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{ticker}/latest',
     method: 'GET'
   })
@@ -86,7 +86,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{symbol}/average-price/{period}',
     method: 'GET'
   })
@@ -129,7 +129,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{symbol}/average-volume/{period}',
     method: 'GET'
   })
@@ -170,7 +170,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{symbol}/average-volume-price/{period}',
     method: 'GET'
   })
@@ -211,7 +211,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/top-price-movers/{period}',
     method: 'GET'
   })
@@ -245,7 +245,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/top-volume-movers/{period}',
     method: 'GET'
   })
@@ -279,7 +279,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote',
     method: 'POST'
   })
@@ -305,7 +305,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote',
     method: 'PUT'
   })
@@ -331,7 +331,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/{id}',
     method: 'DELETE'
   })
@@ -361,7 +361,7 @@ export class QuoteResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/quote/populate',
     method: 'PUT'
   })

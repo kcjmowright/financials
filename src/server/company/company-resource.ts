@@ -13,7 +13,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @Route('company', {
+  @Route({
     method: 'GET',
     path: '/company'
   })
@@ -35,22 +35,22 @@ export class CompanyResource {
       .then(
         (results) => {
           return countQueryBuilder.then(
-            (r) => JSON.stringify(new PageResults(results, +r[0].count, page.page, page.pageSize)),
+            (r) => new PageResults(results, +r[0].count, page.page, page.pageSize),
             (e) => {
               console.log(e);
               response.code(500);
-              return JSON.stringify({
+              return {
                 message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-              });
+              };
             }
           );
         },
         (e) => {
           console.log(e);
           response.code(500);
-          return JSON.stringify({
+          return {
             message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-          });
+          };
         }
       )).type('application/json');
   }
@@ -61,39 +61,39 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @Route('company', {
+  @Route({
     method: 'GET',
     path: '/company/{id}'
   })
   public static getCompany(request, reply): void {
-    let id = request.params.id;
+    let id = parseInt(request.params.id);
 
-    if(isNaN(+id)) {
-      reply(JSON.stringify({
+    if(isNaN(id) || id <= 0) {
+      reply({
         message: `Malformed request id, value is not valid.`
-      })).code(400);
+      }).code(400);
       return;
     }
 
     let response = reply(knex('companies')
       .where({
-        id: +id
+        id: id
       })
       .select('id', 'name', 'ticker', 'sector', 'industry', 'exchange')
       .then((resp) => {
         if(!resp.length) {
           response.code(404);
-          return JSON.stringify({
+          return {
             message: `Company not found.`
-          });
+          };
         }
-        return JSON.stringify(resp[0])
+        return resp[0];
       }, (e) => {
         console.log(e);
         response.code(500);
-        return JSON.stringify({
+        return {
           message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
+        };
       }
     )).type('application/json');
   }
@@ -104,7 +104,7 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @Route('company', {
+  @Route({
     method: 'GET',
     path: '/company/ticker/{ticker}'
   })
@@ -119,17 +119,17 @@ export class CompanyResource {
       .then((resp) => {
           if(!resp.length) {
             response.code(404);
-            return JSON.stringify({
+            return {
               message: `Company not found.`
-            });
+            };
           }
-          return JSON.stringify(resp[0])
+          return resp[0];
         }, (e) => {
           console.log(e);
           response.code(500);
-          return JSON.stringify({
+          return {
             message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-          });
+          };
         }
       )).type('application/json');
   }
@@ -140,12 +140,12 @@ export class CompanyResource {
    * @param reply
    * @return {Response}
    */
-  @Route('company', {
+  @Route({
     method: 'POST',
     path: '/company'
   })
   public static createCompany(request, reply): void {
-    let company: Company = request.payload;
+    let company = Company.newInstance(request.payload);
     let response = reply(knex('companies')
       .returning('id')
       .insert({
@@ -157,13 +157,13 @@ export class CompanyResource {
       })
       .then((resp) => {
         company.id = resp[0];
-        return JSON.stringify(company);
+        return company;
       }, (e) => {
         console.log(e);
         response.code(500);
-        return JSON.stringify({
+        return {
           message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
+        };
       }
     )).type('application/json');
   }
@@ -174,22 +174,18 @@ export class CompanyResource {
    * @param reply
    * @return {any}
    */
-  @Route('company', {
+  @Route({
     method: 'PUT',
     path: '/company'
   })
   public static updateCompany(request, reply): void {
-    let company: Company = request.payload;
+    let company = Company.newInstance(request.payload);
 
-    try {
-      if(!company.id) {
-        throw new Error('Can NOT update company without company ID.');
-      }
-    } catch(e) {
-      console.log(e);
-      return reply(JSON.stringify({
-        message: `Malformed request: ${e.message}`
-      })).code(400);
+    if(!company.id || isNaN(company.id) || company.id <= 0) {
+      reply({
+        message: `Malformed request: Can NOT update company without company ID.`
+      }).code(400).type('application/json');
+      return;
     }
 
     let response = reply(knex('companies')
@@ -208,9 +204,9 @@ export class CompanyResource {
       }, (e) => {
         console.log(e);
         response.code(500);
-        return JSON.stringify({
+        return {
           message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
+        };
       }
     )).type('application/json');
   }
@@ -220,23 +216,23 @@ export class CompanyResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     method: 'DELETE',
     path: '/company/{id}'
   })
   public static removeCompany(request, reply): void {
-    let id = request.params.id;
+    let id = parseInt(request.params.id);
 
-    if (isNaN(+id)) {
-      reply(JSON.stringify({
+    if (isNaN(id) || id <= 0) {
+      reply({
         message: `Malformed request, id is not valid.`
-      })).code(400);
+      }).type('application/json').code(400);
       return;
     }
 
     let response = reply(knex('company')
       .where({
-        id: +id
+        id: id
       })
       .del()
       .then(() => {
@@ -244,9 +240,9 @@ export class CompanyResource {
       }, (e) => {
         console.log(e);
         response.code(500);
-        return JSON.stringify({
+        return {
           message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
+        };
       }
     ));
   }
@@ -256,7 +252,7 @@ export class CompanyResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     method: 'PUT',
     path: '/company/populate'
   })
@@ -297,9 +293,9 @@ export class CompanyResource {
     }, (e) => {
       console.log(e);
       response.code(500);
-      return JSON.stringify({
+      return {
         message: `Error populating companies: ${e.message}`
-      });
-    }));
+      };
+    })).type('application/json');
   }
 }

@@ -9,7 +9,7 @@ export class FundamentalsResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/fundamentals',
     method: 'PUT'
   })

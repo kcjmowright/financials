@@ -9,7 +9,7 @@ export class IncomeStatementResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/income-statement',
     method: 'GET'
   })
@@ -34,24 +34,20 @@ export class IncomeStatementResource {
       .orderBy('symbol')
       .then(
         (results) => {
-          return countQuery.then((r) => {
-            let pageResults = new PageResults(results, r[0].count, page.page, page.pageSize);
-
-            return JSON.stringify(pageResults);
-          }, (e) => {
+          return countQuery.then((r) => new PageResults(results, r[0].count, page.page, page.pageSize), (e) => {
             console.log(e);
             response.code(500);
-            return JSON.stringify({
+            return {
               message: `${e.detail}.  See log for details.`
-            });
+            };
           })
         },
         (e) => {
           console.log(e);
           response.code(500);
-          return JSON.stringify({
+          return {
             message: `${e.detail}.  See log for details.`
-          });
+          };
         }
       )).type('application/json');
   }
@@ -61,13 +57,19 @@ export class IncomeStatementResource {
    * @param request
    * @param reply
    */
-  @Route('company', {
+  @Route({
     path: '/income-statement/{id}',
     method: 'GET'
   })
   public static getIncomeStatement(request, reply): void {
-    let id = request.params.id;
+    let id = parseInt(request.params.id);
 
+    if(isNaN(id) || id <= 0) {
+      reply({
+        message: `Malformed request, ID is not valid.`
+      }).type('application/json').code(400);
+      return;
+    }
     let response = reply(knex('incomestatements')
       .where({
         id: +id
@@ -76,18 +78,18 @@ export class IncomeStatementResource {
       .then((result) => {
         if(!result.length) {
           response.code(404);
-          return JSON.stringify({
+          return {
             message: `Income statement not found.`
-          });
+          };
         }
-        return JSON.stringify(result[0]);
+        return result[0];
 
       }, (e) => {
         console.log(e);
         response.code(500);
-        return JSON.stringify({
+        return {
           message: `Error: ${!!e.detail ? e.detail : e.message}.  See log for details.`
-        });
+        };
       })).type('application/json');
   }
 

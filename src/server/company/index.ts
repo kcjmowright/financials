@@ -13,7 +13,7 @@ import {IncomeStatementResource} from './income-statement-resource';
  * @param next
  */
 export function register(server, options, next): void {
-  ServerRegistrations.register('company', server, [
+  ServerRegistrations.register(server, [
     BalanceSheetResource,
     CashFlowResource,
     CompanyResource,
