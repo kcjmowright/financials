@@ -1,8 +1,10 @@
+export type DIR = 'ASC' | 'DESC';
+
 export class PageRequest {
   public static DEFAULT_PAGE_SIZE = 50;
   public static DEFAULT_PAGE = 1;
 
-  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE) {
+  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE, public sort = '', public dir: DIR = 'ASC') {
   }
 
   public getOffset() {
@@ -14,6 +16,13 @@ export class PageRequest {
 
     page.page = !!options.page ? +options.page : PageRequest.DEFAULT_PAGE;
     page.pageSize = !!options.pageSize ? +options.pageSize : PageRequest.DEFAULT_PAGE_SIZE;
+    page.sort = options.sort;
+
+    if(options.dir && options.dir.toUpperCase() === 'DESC') {
+      page.dir = 'DESC';
+    } else {
+      page.dir = 'ASC';
+    }
     return page;
   }
 }

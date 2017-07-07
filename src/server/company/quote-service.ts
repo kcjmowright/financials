@@ -31,7 +31,7 @@ export class QuoteService {
     return queryBuilder
       .select('id', 'ticker', 'date', 'open', 'high', 'low',
         'close', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
-      .orderBy('date')
+      .orderBy('date' , page.dir)
       .offset(page.getOffset())
       .limit(page.pageSize)
       .then((results) => {
@@ -64,7 +64,7 @@ export class QuoteService {
           countQuery = countQuery.whereBetween('date', [ startDate, endDate ]);
         }
         return countQuery.then((r) => {
-          return new PageResults(list, r[0].count, page.page, page.pageSize);
+          return new PageResults(list, r[0].count, page.page, page.pageSize, 'date', page.dir);
         });
       });
   }
