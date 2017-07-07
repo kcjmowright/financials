@@ -217,12 +217,16 @@ export class QuoteResource {
   })
   public static getTopPriceMovers(request, reply): void {
     let period = parseInt(request.params.period);
+    let minPrice = parseInt(request.query.minprice);
 
     if(!period || isNaN(period) || period <= 0) {
       reply({
         message: `Malformed request, period is not valid.`
       }).type('application/json').code(400);
       return;
+    }
+    if(isNaN(minPrice) || minPrice < 0) {
+      minPrice = 0;
     }
     let response = reply(QuoteResource.quoteService.getTopPriceMovers(period).then(topMovers => {
       if(!topMovers) {
@@ -251,7 +255,7 @@ export class QuoteResource {
   })
   public static getTopVolumeMovers(request, reply): void {
     let period = parseInt(request.params.period);
-    let price = parseInt(request.query.price);
+    let minPrice = parseInt(request.query.minprice);
 
     if(isNaN(period) || period <= 0) {
       reply({
@@ -259,10 +263,10 @@ export class QuoteResource {
       }).type('application/json').code(400);
       return;
     }
-    if(isNaN(price) || price < 0) {
-      price = 0;
+    if(isNaN(minPrice) || minPrice < 0) {
+      minPrice = 0;
     }
-    let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period, price).then(topMovers => {
+    let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period, minPrice).then(topMovers => {
       if(!topMovers) {
         response.code(404);
         return {

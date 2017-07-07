@@ -1,17 +1,21 @@
 import {knex} from '../db';
 import {Company} from '../../company';
+import {CompanyService} from './company-service';
 import {PageRequest, PageResults} from '../../shared';
-import {NasdaqCompaniesStream} from '../feeds';
 import {Promise} from 'bluebird';
 import Route from '../route.decorator';
 
+/**
+ *
+ */
 export class CompanyResource {
+
+  static companyService = new CompanyService(knex);
 
   /**
    *
    * @param request
    * @param reply
-   * @return {Response}
    */
   @Route({
     method: 'GET',
@@ -20,46 +24,21 @@ export class CompanyResource {
   public static findCompanies(request, reply): void {
     let name = request.query.name;
     let page = PageRequest.newPageRequest(request.query);
-    let queryBuilder = knex('companies')
-      .select('id', 'name', 'ticker', 'industry', 'sector', 'exchange')
-      .limit(page.pageSize)
-      .offset(page.getOffset())
-      .orderBy('name');
-    let countQueryBuilder = knex('companies').count('name');
-
-    if(!!name) {
-      queryBuilder = queryBuilder.whereRaw('name like ?', [`%${name}%`]);
-      countQueryBuilder = countQueryBuilder.whereRaw('name like ?', [`%${name}%`]);
-    }
-    let response = reply(queryBuilder
-      .then(
-        (results) => {
-          return countQueryBuilder.then(
-            (r) => new PageResults(results, +r[0].count, page.page, page.pageSize),
-            (e) => {
-              console.log(e);
-              response.code(500);
-              return {
-                message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-              };
-            }
-          );
-        },
-        (e) => {
-          console.log(e);
-          response.code(500);
-          return {
-            message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
-          };
-        }
-      )).type('application/json');
+    let response = reply(CompanyResource.companyService.findCompanies(page, name).catch(
+      e => {
+        console.log(e);
+        response.code(500);
+        return {
+          message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+        };
+      }
+    )).type('application/json');
   }
 
   /**
    *
    * @param request
    * @param reply
-   * @return {Response}
    */
   @Route({
     method: 'GET',
@@ -74,21 +53,15 @@ export class CompanyResource {
       }).code(400);
       return;
     }
-
-    let response = reply(knex('companies')
-      .where({
-        id: id
-      })
-      .select('id', 'name', 'ticker', 'sector', 'industry', 'exchange')
-      .then((resp) => {
-        if(!resp.length) {
+    let response = reply(CompanyResource.companyService.getCompany(id).then(result => {
+        if(!result) {
           response.code(404);
           return {
             message: `Company not found.`
           };
         }
-        return resp[0];
-      }, (e) => {
+        return result;
+      }, e => {
         console.log(e);
         response.code(500);
         return {
@@ -102,7 +75,6 @@ export class CompanyResource {
    *
    * @param request
    * @param reply
-   * @return {Response}
    */
   @Route({
     method: 'GET',
@@ -111,53 +83,20 @@ export class CompanyResource {
   public static getCompanyByTicker(request, reply): void {
     let ticker = request.params.ticker;
 
-    let response = reply(knex('companies')
-      .where({
-        ticker: ticker.toUpperCase()
-      })
-      .select('id', 'name', 'ticker', 'sector', 'industry', 'exchange')
-      .then((resp) => {
-          if(!resp.length) {
-            response.code(404);
-            return {
-              message: `Company not found.`
-            };
-          }
-          return resp[0];
-        }, (e) => {
-          console.log(e);
-          response.code(500);
+    if(!ticker) {
+      reply({
+        message: `Expected ticker symbol.`
+      }).code(400);
+      return;
+    }
+    let response = reply(CompanyResource.companyService.getCompanyByTicker(ticker).then((resp) => {
+        if(!resp) {
+          response.code(404);
           return {
-            message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+            message: `Company not found.`
           };
         }
-      )).type('application/json');
-  }
-
-  /**
-   *
-   * @param request
-   * @param reply
-   * @return {Response}
-   */
-  @Route({
-    method: 'POST',
-    path: '/company'
-  })
-  public static createCompany(request, reply): void {
-    let company = Company.newInstance(request.payload);
-    let response = reply(knex('companies')
-      .returning('id')
-      .insert({
-        name: company.name,
-        ticker: !!company.ticker ? company.ticker.toUpperCase() : null,
-        sector: company.sector,
-        industry: company.industry,
-        exchange: company.exchange
-      })
-      .then((resp) => {
-        company.id = resp[0];
-        return company;
+        return resp;
       }, (e) => {
         console.log(e);
         response.code(500);
@@ -172,7 +111,26 @@ export class CompanyResource {
    *
    * @param request
    * @param reply
-   * @return {any}
+   */
+  @Route({
+    method: 'POST',
+    path: '/company'
+  })
+  public static createCompany(request, reply): void {
+    let company = Company.newInstance(request.payload);
+    let response = reply(CompanyResource.companyService.createCompany(company).catch(e => {
+      console.log(e);
+      response.code(500);
+      return {
+        message: `${!!e.detail ? e.detail : e.message}.  See log for details.`
+      };
+    })).type('application/json');
+  }
+
+  /**
+   *
+   * @param request
+   * @param reply
    */
   @Route({
     method: 'PUT',
@@ -187,18 +145,7 @@ export class CompanyResource {
       }).code(400).type('application/json');
       return;
     }
-
-    let response = reply(knex('companies')
-      .where({
-        id: company.id
-      })
-      .update({
-        name: company.name,
-        ticker: !!company.ticker ? company.ticker.toUpperCase() : null,
-        sector: company.sector,
-        industry: company.industry,
-        exchange: company.exchange
-      })
+    let response = reply(CompanyResource.companyService.updateCompany(company)
       .then(() => {
         response.code(204);
       }, (e) => {
@@ -230,11 +177,7 @@ export class CompanyResource {
       return;
     }
 
-    let response = reply(knex('company')
-      .where({
-        id: id
-      })
-      .del()
+    let response = reply(CompanyResource.companyService.removeCompany(id)
       .then(() => {
         response.code(204);
       }, (e) => {
@@ -257,40 +200,9 @@ export class CompanyResource {
     path: '/company/populate'
   })
   public static populateCompanies(request, reply) {
-    let nasdaq = new Promise((resolve, reject) => {
-      new NasdaqCompaniesStream('NASDAQ', knex).get((e) => {
-        if(!!e) {
-          reject(e);
-          return;
-        }
-        resolve();
-      });
-    });
-    let nyse = new Promise((resolve, reject) => {
-      new NasdaqCompaniesStream('NYSE', knex).get((e) => {
-        if(!!e) {
-          reject(e);
-          return;
-        }
-        resolve();
-      });
-    });
-    let amex = new Promise((resolve, reject) => {
-      new NasdaqCompaniesStream('AMEX', knex).get((e) => {
-        if(!!e) {
-          reject(e);
-          return;
-        }
-        resolve();
-      });
-    });
-    let response = reply(Promise.all([
-      nasdaq,
-      amex,
-      nyse
-    ]).then(() => {
+    let response = reply(CompanyResource.companyService.populateCompanies().then(() => {
       response.code(204);
-    }, (e) => {
+    }, e => {
       console.log(e);
       response.code(500);
       return {

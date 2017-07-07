@@ -5,19 +5,30 @@ import {PageRequest} from '../../shared/page-request';
 import {PageResults} from '../../shared/page-results';
 import {DateUtil} from '../../shared/date-util';
 
+/**
+ * Company quote metrics service.
+ */
 export class QuoteService {
 
+  /**
+   *
+   * @param knex
+   * @constructor
+   */
   constructor(private knex: Knex) {}
 
   /**
    *
-   * @param {string} symbol
-   * @param {Date} [startDate]
-   * @param {Date} [endDate]
-   * @param {PageRequest} [page]
+   * @param {string} symbol Ticker symbol.
+   * @param {Date} [startDate] optional start date.
+   * @param {Date} [endDate] optional end date.
+   * @param {PageRequest} [page] optional page.
    * @return {Promise<PageResults<Quote>>}
    */
   public findQuotes(symbol: string, startDate?: Date, endDate?: Date, page: PageRequest = new PageRequest()): Promise<PageResults<Quote>> {
+    if(!symbol) {
+      return Promise.reject(new Error('Invalid symbol'));
+    }
     let queryBuilder = this.knex('quotes').where({
       ticker: symbol.toUpperCase()
     });
@@ -69,6 +80,11 @@ export class QuoteService {
       });
   }
 
+  /**
+   *
+   * @param symbol Ticker symbol
+   * @return {Promise<Quote>}
+   */
   public getQuote(symbol: string): Promise<Quote> {
     if(!symbol) {
       return Promise.reject(new Error('Ticker symbol not valid'));
@@ -109,7 +125,7 @@ export class QuoteService {
    *
    * @param {string} symbol
    * @param {number} period
-   * @return {Promise}
+   * @return {Promise<any>}
    */
   public getAverageClosingPrice(symbol: string, period: number): Promise<any> {
     if(!symbol) {
@@ -161,9 +177,9 @@ export class QuoteService {
 
   /**
    *
-   * @param {string} symbol
-   * @param {number} period
-   * @return {Promise}
+   * @param {string} symbol Ticker symbol
+   * @param {number} period number of trading days, must be greater than 0.
+   * @return {Promise<any>}
    */
   public getAverageVolume(symbol: string, period: number): Promise<any> {
     if(!symbol) {
@@ -215,12 +231,16 @@ export class QuoteService {
 
   /**
    *
-   * @param {number} [period=22]
+   * @param {number} [period=22] number of days defaults to 22.
+   * @param {number} [minPrice=0] minimum price threshold defaults to 0.
    * @return {Promise<any>}
    */
-  public getTopPriceMovers(period: number = 22): Promise<any> {
+  public getTopPriceMovers(period: number = 22, minPrice: number = 0): Promise<any> {
     if(isNaN(period) || period <= 0) {
       period = 22;
+    }
+    if(isNaN(minPrice) || minPrice < 0) {
+      minPrice = 0;
     }
     return this.knex.raw(`with last_x as (
       select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}
@@ -229,9 +249,11 @@ export class QuoteService {
       select q.ticker, avg(q.close) as avg_close 
       from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
     )
-    select q.ticker, q.date, q.close, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio 
-    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close > 0 AND q.date 
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`).then(result => {
+    select q.ticker, q.date, q.close, q.volume, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio 
+    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where q.close >= :min_price and a.avg_close > 0 AND q.date 
+    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
+      min_price: minPrice
+    }).then(result => {
       if(!result.rows.length) {
         return null;
       }
@@ -244,11 +266,11 @@ export class QuoteService {
 
   /**
    *
-   * @param {number} [period=22] Number of days.
-   * @param {number} [price=0] Closing price threshold.
+   * @param {number} [period=22] Number of days defaults to 22.
+   * @param {number} [minPrice=0] Closing price minimum threshold defaults to 0.
    * @return {Promise<any>}
    */
-  public getTopVolumeMovers(period: number = 22, price: number = 0): Promise<any> {
+  public getTopVolumeMovers(period: number = 22, minPrice: number = 0): Promise<any> {
     if(isNaN(period) || period <= 0) {
       period = 22;
     }
@@ -260,9 +282,9 @@ export class QuoteService {
       from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
     )
     select q.ticker, q.date, q.close, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio 
-    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where q.close >= :close and a.avg_volume > 0 AND q.date 
+    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where q.close >= :min_price and a.avg_volume > 0 AND q.date 
     in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
-      close: price
+      min_price: minPrice
     }).then(result => {
       if(!result.rows.length) {
         return null;
@@ -279,7 +301,7 @@ export class QuoteService {
    * Get the average volume and average price for a given ticker symbol and period in days and compare the volume and price to their averages.
    *
    * @param {string} symbol Ticker symbol.
-   * @param {number} [period=22] Number of days.
+   * @param {number} [period=22] Number of days defaults to 22.
    * @return {Promise<any>}
    */
   public getAverageVolumeAndPriceWithRatios(symbol: string, period: number = 22): Promise<any> {
@@ -367,7 +389,7 @@ export class QuoteService {
    * @return {Promise<void>}
    */
   public updateQuote(quote: Quote): Promise<void> {
-    if(!quote || !quote.id) {
+    if(!quote || !quote.id || isNaN(quote.id)) {
       return Promise.reject(new Error('Expecting a quote instance with a valid ID'));
     }
     return this.knex('quotes').where({
@@ -394,11 +416,11 @@ export class QuoteService {
    * @return {Promise<void>}
    */
   public removeQuote(id: number): Promise<void> {
-    if(isNaN(+id)) {
+    if(isNaN(id)) {
       return Promise.reject(new Error('Expected valid ID'));
     }
     return this.knex('quotes').where({
-      id: +id
+      id: id
     }).del();
   }
 }

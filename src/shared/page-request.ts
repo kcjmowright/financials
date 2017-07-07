@@ -4,7 +4,7 @@ export class PageRequest {
   public static DEFAULT_PAGE_SIZE = 50;
   public static DEFAULT_PAGE = 1;
 
-  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE, public sort = '', public dir: DIR = 'ASC') {
+  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE, public sort: string = '', public dir: DIR = 'ASC') {
   }
 
   public getOffset() {
