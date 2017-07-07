@@ -251,14 +251,18 @@ export class QuoteResource {
   })
   public static getTopVolumeMovers(request, reply): void {
     let period = parseInt(request.params.period);
+    let price = parseInt(request.query.price);
 
-    if(!period || isNaN(period) || period <= 0) {
+    if(isNaN(period) || period <= 0) {
       reply({
         message: `Malformed request, period is not valid.`
       }).type('application/json').code(400);
       return;
     }
-    let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period).then(topMovers => {
+    if(isNaN(price) || price < 0) {
+      price = 0;
+    }
+    let response = reply(QuoteResource.quoteService.getTopVolumeMovers(period, price).then(topMovers => {
       if(!topMovers) {
         response.code(404);
         return {

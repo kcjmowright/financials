@@ -223,7 +223,7 @@ export class QuoteService {
       period = 22;
     }
     return this.knex.raw(`with last_x as (
-      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit :period
+      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}
     ),
     ticker_with_avg_close as (
       select q.ticker, avg(q.close) as avg_close 
@@ -231,9 +231,7 @@ export class QuoteService {
     )
     select q.ticker, q.date, q.close, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio 
     from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close > 0 AND q.date 
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
-      period: period
-    }).then(result => {
+    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`).then(result => {
       if(!result.rows.length) {
         return null;
       }
@@ -246,24 +244,25 @@ export class QuoteService {
 
   /**
    *
-   * @param {number} [period=22]
+   * @param {number} [period=22] Number of days.
+   * @param {number} [price=0] Closing price threshold.
    * @return {Promise<any>}
    */
-  public getTopVolumeMovers(period: number = 22): Promise<any> {
+  public getTopVolumeMovers(period: number = 22, price: number = 0): Promise<any> {
     if(isNaN(period) || period <= 0) {
       period = 22;
     }
     return this.knex.raw(`with last_x as (
-      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit :period
+      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}
     ),
     ticker_with_avg_volume as (
       select q.ticker, avg(q.volume) as avg_volume 
       from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
     )
-    select q.ticker, q.date, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio 
-    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where a.avg_volume > 0 AND q.date 
+    select q.ticker, q.date, q.close, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio 
+    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where q.close >= :close and a.avg_volume > 0 AND q.date 
     in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
-      period: period
+      close: price
     }).then(result => {
       if(!result.rows.length) {
         return null;
@@ -292,7 +291,7 @@ export class QuoteService {
     }
     return this.knex.raw(
       `with last_x as (
-        select q.date as date from quotes q where ticker = :symbol order by q.date desc limit :period
+        select q.date as date from quotes q where ticker = :symbol order by q.date desc limit ${period}
       ),
       ticker_with_avg_close as (
         select q.ticker, avg(q.close) as avg_close from quotes q 
@@ -310,8 +309,7 @@ export class QuoteService {
         inner join ticker_with_avg_volume av on q.ticker = av.ticker 
         inner join ticker_with_avg_close ac on av.ticker = ac.ticker
         where q.date in (select last_x.date from last_x) order by q.date desc`, {
-        symbol: symbol,
-        period: period
+        symbol: symbol
       })
       .then(result => {
         if(!result.rows.length) {
