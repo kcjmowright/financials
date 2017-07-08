@@ -220,7 +220,7 @@ export class QuoteResource {
     if(isNaN(minPrice) || minPrice < 0) {
       minPrice = 0;
     }
-    let response = reply(QuoteResource.quoteService.getTopPriceMovers(period).then(topMovers => {
+    let response = reply(QuoteResource.quoteService.getTopPriceMovers(period, minPrice).then(topMovers => {
       if(!topMovers) {
         response.code(404);
         return {

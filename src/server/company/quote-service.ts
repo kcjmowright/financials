@@ -247,7 +247,7 @@ export class QuoteService {
       from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
     )
     select q.ticker, q.date, q.close, q.volume, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio 
-    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where q.close >= :min_price and a.avg_close > 0 AND q.date 
+    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close >= :min_price and a.avg_close > 0 AND q.date 
     in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
       min_price: minPrice
     }).then(result => {
@@ -328,7 +328,7 @@ export class QuoteService {
         inner join ticker_with_avg_volume av on q.ticker = av.ticker 
         inner join ticker_with_avg_close ac on av.ticker = ac.ticker
         where q.date in (select last_x.date from last_x) order by q.date desc`, {
-        symbol: symbol
+        symbol: symbol.toUpperCase()
       })
       .then(result => {
         if(!result.rows.length) {
