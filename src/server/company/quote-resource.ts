@@ -31,15 +31,7 @@ export class QuoteResource {
       }).code(400).type('application/json');
       return;
     }
-    let response = reply(QuoteResource.quoteService.findQuotes(ticker, startDate, endDate, page).catch((quotes) => {
-      if(!quotes) {
-        response.code(404);
-        return {
-          message: `Quotes not found.`
-        }
-      }
-      return quotes;
-    }, e => {
+    let response = reply(QuoteResource.quoteService.findQuotes(ticker, startDate, endDate, page).catch(e => {
       response.code(500);
       return {
         message: `${!!e.detail ? e.detail : e.message}.  See log for details.`

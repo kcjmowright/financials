@@ -46,9 +46,6 @@ export class QuoteService {
       .offset(page.getOffset())
       .limit(page.pageSize)
       .then((results) => {
-        if(!results.length) {
-          return null;
-        }
         let list = results.map((r) => {
           let quote = new Quote();
 

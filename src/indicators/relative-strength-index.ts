@@ -22,7 +22,10 @@ export class RelativeStrengthIndex {
     this.calculate();
   }
 
-  public calculate(): void {
+  /**
+   *
+   */
+  private calculate(): void {
     let gains = [];
     let losses = [];
     let periodPrices = _.slice(this.prices, 0, this.period + 1);

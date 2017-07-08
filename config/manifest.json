@@ -15,5 +15,10 @@
     "options": {
       "select": ["api"]
     }
+  }, {
+    "plugin": "./indicators",
+    "options": {
+      "select": ["api"]
+    }
   }]
 }
