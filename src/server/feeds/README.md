@@ -61,3 +61,12 @@ http://www.nasdaq.com/symbol/{ticker}
 
 News
 http://www.nasdaq.com/symbol/{ticker}/news-headlines
+
+
+Volatility
+
+Free Weekly Volatility Data
+http://www.optionstrategist.com/calculators/free-volatility-data
+
+Probability Calculator
+http://www.optionstrategist.com/calculators/probability
