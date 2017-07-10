@@ -1,6 +1,6 @@
 import {average} from '../math';
 
-export class SimpleMovingAverage {
+export class ExponentialMovingAverage {
   public averages: { average: number, date: Date }[];
 
   constructor(dates: Date[], values: number[], public period: number = 20) {
@@ -14,14 +14,21 @@ export class SimpleMovingAverage {
     this.averages = [];
     let startIdx = 0;
     let endIdx = period;
+    let lambda =  2 / ( 1 + period );
+    let ema;
+    let previousEMA = average(values.slice(startIdx, endIdx)); // <= Initialize with SMA
+    let avg;
 
     while(endIdx < values.length) {
+      avg = average(values.slice(startIdx, endIdx));
+      ema = ( avg * lambda ) + ( previousEMA * (1 - lambda));
       this.averages.push({
-        average: average(values.slice(startIdx, endIdx)),
+        average: ema,
         date: dates[endIdx - 1]
       });
       startIdx++;
       endIdx++;
+      previousEMA = ema;
     }
   }
 }

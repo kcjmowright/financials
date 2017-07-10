@@ -12,6 +12,7 @@ describe('SimpleMovingAverage', () => {
     let sma = new SimpleMovingAverage(smaMock.dates, smaMock.prices, 10);
 
     expect(sma.period).toEqual(10);
+    expect(sma.averages.length).toEqual(smaMock.dates.length - 10);
     expect(sma.averages[0].date).toEqual(smaMock.dates[9]);
     expect(sma.averages[0].average).toEqual(average(smaMock.prices.slice(0, 10)));
     expect(sma.averages[1].date).toEqual(smaMock.dates[10]);
@@ -32,9 +33,9 @@ describe('SimpleMovingAverage', () => {
     }).toThrowError(/Not enough data\./);
   });
 
-  it('should throw and error if dates and prices data points length don NOT match', () => {
+  it('should throw and error if dates and values data points length do NOT match', () => {
     expect(function() {
       new SimpleMovingAverage(smaMock.dates.slice(0, 5), smaMock.prices, 10);
-    }).toThrowError(/Date and price data points are unequal in length\./);
+    }).toThrowError(/Date and value data points are unequal in length\./);
   });
 });

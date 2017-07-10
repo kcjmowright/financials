@@ -30,6 +30,8 @@ SMA is a lagging indicator used to confirm past actions.
 A weighted moving average where more weight is given to the newer data points.
 EMA is a lagging indicator used to confirm past actions.
 
+See also https://www.compose.com/articles/metrics-maven-calculating-an-exponentially-weighted-moving-average-in-postgresql/
+
 ## MACD
 
 ### Calculation
