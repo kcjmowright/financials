@@ -87,6 +87,7 @@ records a lower low or higher high respectively.
 
 If MACD slope rises dramatically, the 12 day EMA rises faster than the 26 day EMA, this may signify an overbought condition.
 
+![NVDA](moving-average-convergence-divergence.spec.png)
 
 ### See
 
