@@ -6,9 +6,10 @@ Indicators
 
 ### Calculation
 
+```
 ( 100.0 - ( 100.0 / ( 1.0 + rs ) ))
-
 where rs = average gains / average losses
+```
 
 ### Bullish Failure Swing
 
@@ -20,8 +21,18 @@ where rs = average gains / average losses
 
 ## Simple Moving Average SMA
 
-Average of the last x data points.  As new data points are available then the window shifts.
+Average of the last x data points.  As new data points are available then the window shifts adding a new data point to the end and dropping 
+the first data point in the window.
 SMA is a lagging indicator used to confirm past actions.
+
+### Calculations
+
+```
+period is the number of days in the moving window.
+avg = ( ∑ values in period ) / period
+```
+
+### References
 
 [SimpleMovingAverage](simple-moving-average.ts)
 
@@ -30,15 +41,58 @@ SMA is a lagging indicator used to confirm past actions.
 A weighted moving average where more weight is given to the newer data points.
 EMA is a lagging indicator used to confirm past actions.
 
-See also https://www.compose.com/articles/metrics-maven-calculating-an-exponentially-weighted-moving-average-in-postgresql/
 
-## MACD
+### Calculations
+
+```
+period is the number of days in the moving window.
+lambda = 2 / ( 1 + period )
+avg = ( ∑ values in period ) / period 
+( avg * lambda ) + ( previousEMA * ( 1 - lambda ))
+Initialize previousEMA with its SMA.
+```
+
+### See
+
+[ExponentialMovingAverage](exponential-moving-average.ts)
+
+https://www.compose.com/articles/metrics-maven-calculating-an-exponentially-weighted-moving-average-in-postgresql/
+
+## Moving Average Convergence Divergence MACD
+
+A lagging indicator that measures momentum by showing the relationship between two exponential moving averages of prices, usually the 26 day and 12 day EMAs.
 
 ### Calculation
 
-26 day EMA minus 12 day EMA.  9 day EMA is then used as the signal line.
+```
+MACD = 12 day EMA - 26 day EMA.
+signal = 9 day EMA of the MACD.
+histogram = MACD - signal
+```
 
-(todo)
+### Interpretation
+
+#### Crossovers
+
+If MACD falls below the signal line, signifies a bearish condition.
+If MACD rises above the signal line, signifies a bullish condition.
+
+#### Divergence
+
+If security price diverges from the MACD, this could signify an end to the current trend.  
+Divergences of MACD to price occur when one value records a new higher low or lower high while the other
+records a lower low or higher high respectively.
+
+#### Dramatic Rise
+
+If MACD slope rises dramatically, the 12 day EMA rises faster than the 26 day EMA, this may signify an overbought condition.
+
+
+### See
+
+- [MovingAverageConvergenceDivergence](moving-average-convergence-divergence.ts)
+- http://www.investopedia.com/terms/m/macd.asp
+- http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
 
 -------------------
 

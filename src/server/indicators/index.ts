@@ -1,3 +1,4 @@
+import {MacdResource} from './macd-resource';
 import {RsiResource} from './rsi-resource';
 import {ServerRegistrations} from '../server-registrations';
 
@@ -9,6 +10,7 @@ import {ServerRegistrations} from '../server-registrations';
  */
 export function register(server, options, next): void {
   ServerRegistrations.register(server, [
+    MacdResource,
     RsiResource
   ]);
   next();

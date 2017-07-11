@@ -15,7 +15,7 @@ export class SimpleMovingAverage {
     let startIdx = 0;
     let endIdx = period;
 
-    while(endIdx < values.length) {
+    while(endIdx <= values.length) {
       this.averages.push({
         average: average(values.slice(startIdx, endIdx)),
         date: dates[endIdx - 1]

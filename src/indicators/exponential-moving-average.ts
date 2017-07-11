@@ -1,7 +1,7 @@
 import {average} from '../math';
 
 export class ExponentialMovingAverage {
-  public averages: { average: number, date: Date }[];
+  public averages: { average: number, date: Date, value: number }[];
 
   constructor(dates: Date[], values: number[], public period: number = 20) {
     if(values.length < period) {
@@ -19,12 +19,13 @@ export class ExponentialMovingAverage {
     let previousEMA = average(values.slice(startIdx, endIdx)); // <= Initialize with SMA
     let avg;
 
-    while(endIdx < values.length) {
+    while(endIdx <= values.length) {
       avg = average(values.slice(startIdx, endIdx));
       ema = ( avg * lambda ) + ( previousEMA * (1 - lambda));
       this.averages.push({
         average: ema,
-        date: dates[endIdx - 1]
+        date: dates[endIdx - 1],
+        value: values[endIdx - 1]
       });
       startIdx++;
       endIdx++;

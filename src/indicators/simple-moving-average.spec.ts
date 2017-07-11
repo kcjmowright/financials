@@ -12,7 +12,7 @@ describe('SimpleMovingAverage', () => {
     let sma = new SimpleMovingAverage(smaMock.dates, smaMock.prices, 10);
 
     expect(sma.period).toEqual(10);
-    expect(sma.averages.length).toEqual(smaMock.dates.length - 10);
+    expect(sma.averages.length).toEqual(smaMock.dates.length - 9);
     expect(sma.averages[0].date).toEqual(smaMock.dates[9]);
     expect(sma.averages[0].average).toEqual(average(smaMock.prices.slice(0, 10)));
     expect(sma.averages[1].date).toEqual(smaMock.dates[10]);
