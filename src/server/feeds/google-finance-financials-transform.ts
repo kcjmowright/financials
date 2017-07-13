@@ -4,35 +4,38 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 
 export class GoogleFinanceFinancialsTransform extends Transform {
+
+  /**
+   *
+   * @param {string} [doc='']
+   * @param {string} [path='']
+   * @param {string} [symbol='']
+   * @constructor
+   */
   constructor(doc: string = '', path: string = '', symbol: string = '') {
    super({
-     objectMode: true,
-     transform: function(buf: string | Buffer, enc: string, next: Function) {
-       doc += Buffer.isBuffer(buf) ? buf.toString('utf8') : buf;
-       next();
-     },
-     flush: function(next: Function) {
-       // console.log(`Flushing doc:\n${doc}`);
+     flush: function flush(next: Function) {
+
        symbol = symbol.toUpperCase();
 
        let $ = cheerio.load(doc);
        let $thead = $('#fs-table > thead').filter((i) => i % 2 === 0); // skip annual statements
        let $tbody = $('#fs-table > tbody').filter((i) => i % 2 === 0);
        let parsed = [{
-         title: 'Income Statement',
-         symbol: symbol,
+         quarters: [{}, {}, {}, {}, {}],
          source: path,
-         quarters: [{}, {}, {}, {}, {}]
+         symbol: symbol,
+         title: 'Income Statement'
        }, {
-         title: 'Balance Statement',
-         symbol: symbol,
+         quarters: [{}, {}, {}, {}, {}],
          source: path,
-         quarters: [{}, {}, {}, {}, {}]
+         symbol: symbol,
+         title: 'Balance Statement'
        }, {
-         title: 'Cash Flow',
-         symbol: symbol,
+         quarters: [{}, {}, {}, {}, {}],
          source: path,
-         quarters: [{}, {}, {}, {}, {}]
+         symbol: symbol,
+         title: 'Cash Flow'
        }];
 
        $thead.each((idx, thead) => {
@@ -45,7 +48,9 @@ export class GoogleFinanceFinancialsTransform extends Transform {
              let match = $(th).text().trim().match(/\d{4}-\d{2}-\d{2}/);
 
              if(!!match) {
+               /* tslint:disable no-string-literal */
                parsed[idx].quarters[j]['endDate'] = moment(match[0], 'YYYY-MM-DD').toDate();
+               /* tslint:enable no-string-literal */
              }
            });
          });
@@ -56,7 +61,6 @@ export class GoogleFinanceFinancialsTransform extends Transform {
          $row.each((i, row) => {
            let $td = $(row).find('td');
            let key = _.camelCase($td.eq(0).text());
-
 
            $td.slice($td.length - 5).each((j, td) => {
              let value = parseFloat($(td).text().replace(/\(/g, '-').replace(/[^0-9()-.]/g, ''));
@@ -70,7 +74,12 @@ export class GoogleFinanceFinancialsTransform extends Transform {
        });
        this.push(parsed);
        next();
+     },
+     objectMode: true,
+     transform: function transform(buf: string | Buffer, enc: string, next: Function) {
+       doc += Buffer.isBuffer(buf) ? buf.toString('utf8') : buf;
+       next();
      }
-   })
+   });
   }
 }

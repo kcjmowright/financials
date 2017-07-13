@@ -10,8 +10,8 @@ export class CashFlowResource {
    * @param reply
    */
   @Route({
-    path: '/cash-flow',
-    method: 'GET'
+    method: 'GET',
+    path: '/cash-flow'
   })
   public static findCashFlows(request, reply): void {
     let symbol = request.query.symbol;
@@ -40,7 +40,7 @@ export class CashFlowResource {
             return {
               message: `${e.detail}.  See log for details.`
             };
-          })
+          });
         },
         (e) => {
           console.log(e);
@@ -58,11 +58,11 @@ export class CashFlowResource {
    * @param reply
    */
   @Route({
-    path: '/cash-flow/{id}',
-    method: 'GET'
+    method: 'GET',
+    path: '/cash-flow/{id}'
   })
   public static getCashFlow(request, reply): void {
-    let id = parseInt(request.params.id);
+    let id = parseInt(request.params.id, 10);
 
     if(isNaN(id) || id <= 0) {
       reply({

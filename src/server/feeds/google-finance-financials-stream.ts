@@ -5,10 +5,22 @@ import {FinancialsDbWritable} from './financials-db-writable';
 import {knex} from '../db';
 
 export class GoogleFinanceFinancialsStream extends HttpsFetchStream {
+
+  /**
+   *
+   * @param symbol
+   * @param exchange
+   * @constructor
+   */
   constructor(public symbol: string, public exchange: string) {
     super('www.google.com', `/finance?q=${encodeURIComponent(exchange.toUpperCase() + ':' + symbol.toUpperCase())}&fstype=ii`);
   }
 
+  /**
+   *
+   * @param {IncomingMessage} res
+   * @param {Function} [callback]
+   */
   public onResponse = (res: IncomingMessage, callback?: Function) => {
     console.log(`Parsing response to ${this.host}${this.path}`);
 
@@ -21,5 +33,5 @@ export class GoogleFinanceFinancialsStream extends HttpsFetchStream {
       callback();
     });
     res.pipe(transform).pipe(writable);
-  };
+  }
 }

@@ -10,8 +10,8 @@ export class FundamentalsResource {
    * @param reply
    */
   @Route({
-    path: '/fundamentals',
-    method: 'PUT'
+    method: 'PUT',
+    path: '/fundamentals'
   })
   public static populateFundamentals(request, reply) {
     new GoogleFinanceFinancialsService(knex).fetchFinancials();

@@ -9,7 +9,7 @@
     "clean": "rm -fR ./lib ./coverage",
     "start": "npm run build:live",
     "start-server": "node lib/index.js",
-    "test": "tsc && istanbul cover --report json jasmine lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
+    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc && istanbul cover --report json jasmine lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
   },
   "author": "jwright",
   "license": "BSD-Source-Code",
@@ -23,6 +23,7 @@
     "remap-istanbul": "^0.9.5",
     "through": "^2.3.8",
     "ts-node": "^3.0.6",
+    "tslint": "^5.5.0",
     "typescript": "^2.3.2",
     "vinyl-source-stream": "^1.1.0"
   },

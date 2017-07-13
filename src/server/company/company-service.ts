@@ -96,11 +96,11 @@ export class CompanyService {
     return this.knex('companies')
       .returning('id')
       .insert({
-        name: company.name,
-        ticker: !!company.ticker ? company.ticker.toUpperCase() : null,
-        sector: company.sector,
+        exchange: company.exchange,
         industry: company.industry,
-        exchange: company.exchange
+        name: company.name,
+        sector: company.sector,
+        ticker: !!company.ticker ? company.ticker.toUpperCase() : null
       })
       .then(resp => {
         company.id = resp[0];
@@ -125,11 +125,11 @@ export class CompanyService {
         id: company.id
       })
       .update({
-        name: company.name,
-        ticker: !!company.ticker ? company.ticker.toUpperCase() : null,
-        sector: company.sector,
+        exchange: company.exchange,
         industry: company.industry,
-        exchange: company.exchange
+        name: company.name,
+        sector: company.sector,
+        ticker: !!company.ticker ? company.ticker.toUpperCase() : null
       });
   }
 

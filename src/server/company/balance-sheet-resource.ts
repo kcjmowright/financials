@@ -10,8 +10,8 @@ export class BalanceSheetResource {
    * @param reply
    */
   @Route({
-    path: '/balance-sheet',
-    method: 'GET'
+    method: 'GET',
+    path: '/balance-sheet'
   })
   public static findBalanceSheets(request, reply): void {
     let symbol = request.query.symbol;
@@ -40,7 +40,7 @@ export class BalanceSheetResource {
             return {
               message: `${e.detail}.  See log for details.`
             };
-          })
+          });
         },
         (e) => {
           console.log(e);
@@ -58,11 +58,11 @@ export class BalanceSheetResource {
    * @param reply
    */
   @Route({
-    path: '/balance-sheet/{id}',
-    method: 'GET'
+    method: 'GET',
+    path: '/balance-sheet/{id}'
   })
   public static getBalanceSheet(request, reply): void {
-    let id = parseInt(request.params.id);
+    let id = parseInt(request.params.id, 10);
 
     if(isNaN(id) || id <= 0) {
       reply({

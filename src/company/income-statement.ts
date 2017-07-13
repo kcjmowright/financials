@@ -50,5 +50,5 @@ export class IncomeStatement {
   public normalizedIncomeAfterTaxes: number;
   public normalizedIncomeAvailToCommon: number;
   public basicNormalizedEps: number;
-  "dilutedNormalizedEps": 35
+  public dilutedNormalizedEps: number;
 }

@@ -45,7 +45,7 @@ export class CompanyResource {
     path: '/company/{id}'
   })
   public static getCompany(request, reply): void {
-    let id = parseInt(request.params.id);
+    let id = parseInt(request.params.id, 10);
 
     if(isNaN(id) || id <= 0) {
       reply({
@@ -168,7 +168,7 @@ export class CompanyResource {
     path: '/company/{id}'
   })
   public static removeCompany(request, reply): void {
-    let id = parseInt(request.params.id);
+    let id = parseInt(request.params.id, 10);
 
     if (isNaN(id) || id <= 0) {
       reply({

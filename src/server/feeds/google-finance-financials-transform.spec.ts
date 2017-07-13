@@ -12,9 +12,9 @@ describe('Transform: GoogleFinanceFinancialsTransform', () => {
     let transform = new GoogleFinanceFinancialsTransform(doc, path, symbol);
     let writable = new Writable({
       objectMode: true,
-      write: (incomeStatement: any, enc: string, done: Function) => {
+      write: (incomeStatement: any, enc: string, cb: Function) => {
         obj = incomeStatement;
-        done();
+        cb();
       }
     });
 

@@ -81,14 +81,14 @@ export class MovingAverageConvergenceDivergence {
       if(prevAboveSignal !== null) {
         if(prevAboveSignal !== aboveSignal) {
           this.signalLineCrossovers.push({
-            date: value.date,
-            bullish: aboveSignal
+            bullish: aboveSignal,
+            date: value.date
           });
         }
         if(prevAboveCenter !== aboveCenter) {
           this.centerLineCrossovers.push({
-            date: value.date,
-            bullish: aboveCenter
+            bullish: aboveCenter,
+            date: value.date
           });
         }
       }

@@ -38,7 +38,7 @@ describe('MovingAverageConvergenceDivergence', () => {
     let self = this;
 
     expect(function() {
-      new MovingAverageConvergenceDivergence(self.dates.slice(0, 5), self.values);
+      return new MovingAverageConvergenceDivergence(self.dates.slice(0, 5), self.values);
     }).toThrowError(/Date and value data points are unequal in length\./);
   });
 });

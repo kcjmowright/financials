@@ -10,8 +10,8 @@ export class IncomeStatementResource {
    * @param reply
    */
   @Route({
-    path: '/income-statement',
-    method: 'GET'
+    method: 'GET',
+    path: '/income-statement'
   })
   public static findIncomeStatements(request, reply): void {
     let symbol = request.query.symbol;
@@ -40,7 +40,7 @@ export class IncomeStatementResource {
             return {
               message: `${e.detail}.  See log for details.`
             };
-          })
+          });
         },
         (e) => {
           console.log(e);
@@ -58,11 +58,11 @@ export class IncomeStatementResource {
    * @param reply
    */
   @Route({
-    path: '/income-statement/{id}',
-    method: 'GET'
+    method: 'GET',
+    path: '/income-statement/{id}'
   })
   public static getIncomeStatement(request, reply): void {
-    let id = parseInt(request.params.id);
+    let id = parseInt(request.params.id, 10);
 
     if(isNaN(id) || id <= 0) {
       reply({

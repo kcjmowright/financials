@@ -18,13 +18,13 @@ describe('ExponentialMovingAverage', () => {
 
   it('should throw an error if period is greater than the number of data points', () => {
     expect(function() {
-      new ExponentialMovingAverage(smaMock.dates, smaMock.prices, smaMock.dates.length + 1);
+      return new ExponentialMovingAverage(smaMock.dates, smaMock.prices, smaMock.dates.length + 1);
     }).toThrowError(/Not enough data\./);
   });
 
   it('should throw and error if dates and values data points length do NOT match', () => {
     expect(function() {
-      new ExponentialMovingAverage(smaMock.dates.slice(0, 5), smaMock.prices, 10);
+      return new ExponentialMovingAverage(smaMock.dates.slice(0, 5), smaMock.prices, 10);
     }).toThrowError(/Date and value data points are unequal in length\./);
   });
 });

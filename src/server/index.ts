@@ -6,6 +6,9 @@ const options = {
   relativeTo: __dirname
 };
 
+/**
+ * Starts the REST server.
+ */
 Glue.compose(config, options, (error, server) => {
   if(error) {
     console.log(error);
@@ -19,4 +22,3 @@ Glue.compose(config, options, (error, server) => {
     console.log('Server running at:', server.info.uri);
   });
 });
-

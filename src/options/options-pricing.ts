@@ -180,7 +180,7 @@ export class OptionsPricing {
     let i = MAX_ITER;
     let sigma = (optionPrice / stockPrice) / (0.398 * sqt);
 
-    for (;--i >= 0;) {
+    for (; --i >= 0; ) {
       let price = OptionsPricing.blackScholes(optionType, stockPrice, strikePrice, noRiskInterest, sigma, timeToMaturity);
       let diff = optionPrice - price;
 

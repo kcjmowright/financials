@@ -16,14 +16,20 @@ export class GoogleFinanceFinancialsService {
 
           chain(calls, 0);
 
-          function chain(calls, index): Promise {
-            if(index >= calls.length) {
+          /**
+           *
+           * @param c
+           * @param index
+           * @private
+           */
+          function chain(c, index): void {
+            if(index >= c.length) {
               resolve();
             } else {
-              calls[index]().then(() => chain(calls, index + 1), (e) => {
+              c[index]().then(() => chain(c, index + 1), (e) => {
                 console.log(`Error : ${e.message}`);
-                chain(calls, index + 1);
-              })
+                chain(c, index + 1);
+              });
             }
           }
         }, (e) => {
@@ -33,7 +39,6 @@ export class GoogleFinanceFinancialsService {
       () => console.log('Done populating financials.'),
       e => console.log(`Error populating financials: ${e.message}`)
     );
-
 
     function futureCall(symbol: string, exchange: string) {
       console.log(`queueing ${exchange}:${symbol}`);
@@ -48,7 +53,7 @@ export class GoogleFinanceFinancialsService {
             resolve();
           }), 5000);
         });
-      }
+      };
     }
 
   }

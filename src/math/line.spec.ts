@@ -29,19 +29,19 @@ describe('Line', () => {
 
   it('should throw and error if the wrong number or type of arguments are passed', () => {
     expect(function() {
-      new Line(0, 1, 2);
+      return new Line(0, 1, 2);
     }).toThrowError(/Unexpected arguments/);
     expect(function() {
-      new Line(new Point(0, 1), 1, 2);
+      return new Line(new Point(0, 1), 1, 2);
     }).toThrowError(/Unexpected arguments/);
     expect(function() {
-      new Line(new Point(0, 1), new Point(0, 1), 2);
+      return new Line(new Point(0, 1), new Point(0, 1), 2);
     }).toThrowError(/Unexpected arguments/);
     expect(function() {
-      new Line(new Point(0, 1), new Point(0, 1), 2, 3);
+      return new Line(new Point(0, 1), new Point(0, 1), 2, 3);
     }).toThrowError(/Unexpected arguments/);
     expect(function() {
-      new Line(1, new Point(0, 1), 2, 3);
+      return new Line(1, new Point(0, 1), 2, 3);
     }).toThrowError(/Unexpected arguments/);
   });
 

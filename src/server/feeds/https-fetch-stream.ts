@@ -3,16 +3,26 @@ import * as _ from 'lodash';
 
 export class HttpsFetchStream {
 
+  /**
+   *
+   * @param {string} host
+   * @param {string} path
+   * @constructor
+   */
   constructor(public host: string, public path: string) {
   }
 
+  /**
+   * Performs an HTTPS request.
+   * @param {Function} [callback] Optional callback function invoked on 'finish'.
+   */
   public get = (callback?: Function) => {
     console.log(`Calling ${this.host}${this.path}`);
     const options = {
       host: this.host,
-      port: 443,
+      method: 'GET',
       path: this.path,
-      method: 'GET'
+      port: 443
     };
     const req = https.request(options, (res: https.IncomingMessage) => {
       this.onResponse(res, callback);
@@ -25,8 +35,13 @@ export class HttpsFetchStream {
       }
     });
     req.end();
-  };
+  }
 
+  /**
+   * Method is intended to be overridden by subclasses and is invoked on response to an HTTP request.
+   * @param {IncomingMessage} res response stream.
+   * @param {Function} [callback] Optional callback function invoked on 'finish'.
+   */
   public onResponse = (res: https.IncomingMessage, callback?: Function) => {
     if(_.isFunction(callback)) {
       res.on('finish', callback);

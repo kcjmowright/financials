@@ -16,8 +16,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{ticker}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/{ticker}'
   })
   public static findQuotes(request, reply): void {
     let startDate = request.query.startDate;
@@ -45,8 +45,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{ticker}/latest',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/{ticker}/latest'
   })
   public static getQuote(request, reply): void {
     let ticker = request.params.ticker;
@@ -79,12 +79,12 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{symbol}/average-price/{period}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/{symbol}/average-price/{period}'
   })
   public static getAverageClosingPrice(request, reply): void {
     let symbol = request.params.symbol;
-    let period = parseInt(request.params.period);
+    let period = parseInt(request.params.period, 10);
 
     if(!symbol) {
       reply({
@@ -122,12 +122,12 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{symbol}/average-volume/{period}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/{symbol}/average-volume/{period}'
   })
   public static getAverageVolume(request, reply): void {
     let symbol = request.params.symbol;
-    let period = parseInt(request.params.period);
+    let period = parseInt(request.params.period, 10);
 
     if(!symbol) {
       reply({
@@ -163,12 +163,12 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{symbol}/average-volume-price/{period}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/{symbol}/average-volume-price/{period}'
   })
   public static getAverageVolumeAndPrice(request, reply): void {
     let symbol = request.params.symbol;
-    let period = parseInt(request.params.period);
+    let period = parseInt(request.params.period, 10);
 
     if(!symbol) {
       reply({
@@ -204,12 +204,12 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/top-price-movers/{period}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/top-price-movers/{period}'
   })
   public static getTopPriceMovers(request, reply): void {
-    let period = parseInt(request.params.period);
-    let minPrice = parseInt(request.query.minprice);
+    let period = parseInt(request.params.period, 10);
+    let minPrice = parseInt(request.query.minprice, 10);
 
     if(!period || isNaN(period) || period <= 0) {
       reply({
@@ -242,12 +242,12 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/top-volume-movers/{period}',
-    method: 'GET'
+    method: 'GET',
+    path: '/quote/top-volume-movers/{period}'
   })
   public static getTopVolumeMovers(request, reply): void {
-    let period = parseInt(request.params.period);
-    let minPrice = parseInt(request.query.minprice);
+    let period = parseInt(request.params.period, 10);
+    let minPrice = parseInt(request.query.minprice, 10);
 
     if(isNaN(period) || period <= 0) {
       reply({
@@ -280,8 +280,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote',
-    method: 'POST'
+    method: 'POST',
+    path: '/quote'
   })
   public static createQuote(request, reply): void {
     let quote: Quote = Quote.newInstance(request.payload);
@@ -306,8 +306,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote',
-    method: 'PUT'
+    method: 'PUT',
+    path: '/quote'
   })
   public static updateQuote(request, reply): void {
     let quote = Quote.newInstance(request.payload);
@@ -332,8 +332,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/{id}',
-    method: 'DELETE'
+    method: 'DELETE',
+    path: '/quote/{id}'
   })
   public static removeQuote(request, reply): void {
     let id = request.params.id;
@@ -362,8 +362,8 @@ export class QuoteResource {
    * @param reply
    */
   @Route({
-    path: '/quote/populate',
-    method: 'PUT'
+    method: 'PUT',
+    path: '/quote/populate'
   })
   public static populateQuotes(request, reply) {
     let symbol = request.query.symbol;

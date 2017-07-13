@@ -28,5 +28,5 @@ export namespace register {
   export const attributes = {
     name: 'company',
     version: '1.0.0'
-  }
+  };
 }

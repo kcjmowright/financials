@@ -83,13 +83,13 @@ describe('RSI', function() {
   });
 
   it('should find bullish failure swings', function() {
-    let rsiMock = JSON.parse(fs.readFileSync('src/indicators/relative-strength-bullish-failure-swing.mock.json', 'utf8'));
+    let rsiBullishFailure = JSON.parse(fs.readFileSync('src/indicators/relative-strength-bullish-failure-swing.mock.json', 'utf8'));
 
-    rsiMock.dates = rsiMock.dates.map(function(s) {
+    rsiBullishFailure.dates = rsiBullishFailure.dates.map(function(s) {
       return new Date(s + 'T21:30:00Z');
     });
 
-    let rsi = new RelativeStrengthIndex(rsiMock.prices, rsiMock.dates, rsiMock.period);
+    let rsi = new RelativeStrengthIndex(rsiBullishFailure.prices, rsiBullishFailure.dates, rsiBullishFailure.period);
     let failureSwing = rsi.findFailureSwings();
 
     expect(failureSwing).toBeDefined();
@@ -101,13 +101,13 @@ describe('RSI', function() {
   });
 
   xit('should find bearish failure swings', function() {
-    let rsiMock = JSON.parse(fs.readFileSync('src/indicators/relative-strength-bearish-failure-swing.mock.json', 'utf8'));
+    let bearishFailureSwingMock = JSON.parse(fs.readFileSync('src/indicators/relative-strength-bearish-failure-swing.mock.json', 'utf8'));
 
-    rsiMock.dates = rsiMock.dates.map(function(s) {
+    bearishFailureSwingMock.dates = bearishFailureSwingMock.dates.map(function(s) {
       return new Date(s + 'T21:30:00Z');
     });
 
-    let rsi = new RelativeStrengthIndex(rsiMock.prices, rsiMock.dates, rsiMock.period);
+    let rsi = new RelativeStrengthIndex(bearishFailureSwingMock.prices, bearishFailureSwingMock.dates, bearishFailureSwingMock.period);
     let failureSwing = rsi.findFailureSwings();
 
     expect(failureSwing).toBeDefined();
@@ -118,20 +118,11 @@ describe('RSI', function() {
     // expect(failureSwing[0].price).toBe(44.85);
   });
 
-  xit('should be overbought', function() {
-
-  });
-
-  xit('should be oversold', function() {
-
-  });
-
-  xit('should find bullish divergences', function() {
-
-  });
-
-  xit('should find bearish divergences', function() {
-
-  });
-
+  // xit('should be overbought', function() {});
+  //
+  // xit('should be oversold', function() {});
+  //
+  // xit('should find bullish divergences', function() {});
+  //
+  // xit('should find bearish divergences', function() {});
 });

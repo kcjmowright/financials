@@ -6,15 +6,25 @@ import {IncomingMessage} from 'https';
 import {Writable} from 'stream';
 
 /**
- *
- *
+ * Calls Nasdaq to acquire a list of companies by exchange, parses and pipes the result to a db.
  */
 export class NasdaqCompaniesStream extends HttpFetchStream {
 
+  /**
+   *
+   * @param {string} exchange a market exchange identifier, i.e. NASDAQ, NYSE, AMEX.
+   * @param {Knex} knex the db connection.
+   * @constructor
+   */
   constructor(public exchange: string, public knex: Knex) {
     super(`www.nasdaq.com`, `/screening/companies-by-industry.aspx?exchange=${exchange}&render=download`);
   }
 
+  /**
+   *
+   * @param {IncomingMessage} res
+   * @param {Function} [callback] Optional callback function invoked on stream 'finish';
+   */
   public onResponse = (res: IncomingMessage, callback?: Function) => {
     let parser = parse({
       auto_parse: true,
@@ -31,11 +41,11 @@ export class NasdaqCompaniesStream extends HttpFetchStream {
         }).select('id').then((results) => {
           if(!results.length) {
             this.knex('companies').insert({
-              name: company.Name,
-              ticker: company.Symbol,
-              sector: company.Sector,
+              exchange: this.exchange,
               industry: company.Industry,
-              exchange: this.exchange
+              name: company.Name,
+              sector: company.Sector,
+              ticker: company.Symbol
             }).then(() => next(), next);
           } else {
             next();
@@ -43,8 +53,9 @@ export class NasdaqCompaniesStream extends HttpFetchStream {
         }, next);
       }
     });
+
     writable.on('finish', callback);
     writable.on('error', (e) => callback(e));
     res.pipe(parser).pipe(writable);
-  };
+  }
 }

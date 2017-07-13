@@ -10,12 +10,12 @@ export class RsiResource {
   public static rsiService = new RsiService(knex);
 
   @Route({
-    path: '/rsi/{symbol}',
-    method: 'GET'
+    method: 'GET',
+    path: '/rsi/{symbol}'
   })
   public static getRsiForSymbolAndPeriod(request, reply) {
-    let limit = parseInt(request.query.limit);
-    let period = parseInt(request.query.period);
+    let limit = parseInt(request.query.limit, 10);
+    let period = parseInt(request.query.period, 10);
     let symbol = request.params.symbol;
 
     if(!symbol) {
@@ -45,4 +45,5 @@ export class RsiResource {
       };
     })).type('application/json');
   }
+
 }

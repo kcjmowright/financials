@@ -48,7 +48,7 @@ describe('Class: Fundamentals', function() {
 
   it('should calculate working capital', function() {
     expect(this.fundamentals.workingCapital())
-      .toBe(this.fundamentals.assets - this.fundamentals.liabilities)
+      .toBe(this.fundamentals.assets - this.fundamentals.liabilities);
   });
 
 });

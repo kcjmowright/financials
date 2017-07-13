@@ -32,7 +32,7 @@ describe('Class: ForecastPeriod', function() {
   it('should forecast operating costs', function() {
     let operatingCostsPercentage = 0.15;
     let targetOperatingCostsPercentage = 0.25;
-    let forecastedOperatingCosts = this.forecastPeriod.forecastOperatingCosts(operatingCostsPercentage, targetOperatingCostsPercentage)
+    let forecastedOperatingCosts = this.forecastPeriod.forecastOperatingCosts(operatingCostsPercentage, targetOperatingCostsPercentage);
 
     expect(forecastedOperatingCosts.length).toEqual(this.forecastPeriod.revenues.length);
     expect(forecastedOperatingCosts.pop()).toEqual(this.forecastPeriod.revenues.pop() * targetOperatingCostsPercentage);

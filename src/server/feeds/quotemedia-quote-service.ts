@@ -38,18 +38,18 @@ export class QuotemediaQuoteService {
 
       /**
        *
-       * @param calls
-       * @param index
+       * @param {Function[]} c
+       * @param {number} index
        * @private
        */
-      function chain(calls, index): Promise {
-        if(index >= calls.length) {
+      function chain(c: Function[], index: number) {
+        if(index >= c.length) {
           resolve();
         } else {
-          calls[index]().then(() => chain(calls, index + 1), (e) => {
+          c[index]().then(() => chain(c, index + 1), (e) => {
             console.log(`Error : ${e.message}`);
-            chain(calls, index + 1);
-          })
+            chain(c, index + 1);
+          });
         }
       }
     });
@@ -70,7 +70,7 @@ export class QuotemediaQuoteService {
             resolve();
           });
         });
-      }
+      };
     }
   }
 }

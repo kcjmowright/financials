@@ -54,8 +54,8 @@ export class RelativeStrengthIndex {
 
     this.values.push({
       date: afterPeriodDates.shift(),
-      rsi: this.rsi(avgGains, avgLosses),
-      price: prevPrice
+      price: prevPrice,
+      rsi: this.rsi(avgGains, avgLosses)
     });
 
     _.each(afterPeriodPrices, (price, idx) => {
@@ -75,8 +75,8 @@ export class RelativeStrengthIndex {
 
       this.values.push({
         date: d,
-        rsi: this.rsi(gain, loss),
-        price: price
+        price: price,
+        rsi: this.rsi(gain, loss)
       });
 
       prevPrice = price;
@@ -204,5 +204,3 @@ export class RelativeStrengthIndex {
     return failureSwings;
   }
 }
-
-

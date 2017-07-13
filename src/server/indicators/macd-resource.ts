@@ -12,14 +12,14 @@ export class MacdResource {
   public static macdService = new MacdService(knex);
 
   @Route({
-    path: '/macd/{symbol}',
-    method: 'GET'
+    method: 'GET',
+    path: '/macd/{symbol}'
   })
   public static getMacdForSymbol(request, reply) {
-    let limit = parseInt(request.query.limit);
-    let longPeriod = parseInt(request.query.longPeriod);
-    let shortPeriod = parseInt(request.query.shortPeriod);
-    let signalPeriod = parseInt(request.query.signalPeriod);
+    let limit = parseInt(request.query.limit, 10);
+    let longPeriod = parseInt(request.query.longPeriod, 10);
+    let shortPeriod = parseInt(request.query.shortPeriod, 10);
+    let signalPeriod = parseInt(request.query.signalPeriod, 10);
     let symbol = request.params.symbol;
 
     if(!symbol) {
@@ -57,14 +57,14 @@ export class MacdResource {
   }
 
   @Route({
-    path: '/macd/{symbol}.csv',
-    method: 'GET'
+    method: 'GET',
+    path: '/macd/{symbol}.csv'
   })
   public static getMacdForSymbolCSV(request, reply) {
-    let limit = parseInt(request.query.limit);
-    let longPeriod = parseInt(request.query.longPeriod);
-    let shortPeriod = parseInt(request.query.shortPeriod);
-    let signalPeriod = parseInt(request.query.signalPeriod);
+    let limit = parseInt(request.query.limit, 10);
+    let longPeriod = parseInt(request.query.longPeriod, 10);
+    let shortPeriod = parseInt(request.query.shortPeriod, 10);
+    let signalPeriod = parseInt(request.query.signalPeriod, 10);
     let symbol = request.params.symbol;
 
     if(!symbol) {
@@ -92,7 +92,7 @@ export class MacdResource {
           return 'Ticker symbol not found.';
         }
         return result.values.map(v => {
-          return `"${DateUtil.toISODateString(v.date)}", ${v.macdSlope}, ${v.macd}, ${v.distance}, ${v.histogram}, ${v.longEMA}, ${v.shortEMA}, ${v.signal}, ${v.value}, ${v.valueSlope}\n`
+          return `"${DateUtil.toISODateString(v.date)}", ${v.macdSlope}, ${v.macd}, ${v.distance}, ${v.histogram}, ${v.longEMA}, ${v.shortEMA}, ${v.signal}, ${v.value}, ${v.valueSlope}\n`;
         }).join('');
       }, e => {
         response.code(500);

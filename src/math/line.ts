@@ -80,7 +80,7 @@ export class Line {
       isParallel: isParallel,
       x: x, // x value of intersection.
       y: y // y value of intersection.
-    }
+    };
   }
 
 }
