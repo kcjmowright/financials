@@ -1,8 +1,9 @@
 Indicators
 ============================
 
-
 ## Relative Strength Index (RSI)
+
+A momentum oscillator that measures the speed and change of price movements.
 
 ### Calculation
 
@@ -13,11 +14,23 @@ where rs = average gains / average losses
 
 ### Bullish Failure Swing
 
+A bullish failure swing forms when RSI moves below 30 (oversold),
+bounces above 30, pulls back, holds above 30 and then breaks its prior high.  It is basically a move to oversold levels and then a higher low above oversold levels.
+
 ![Bullish Failure Swing](relative-strength-bullish-failure-swing.png)
 
 ### Bearish Failure Swing
 
-(todo)
+A bearish failure swing forms when RSI moves above 70,
+pulls back, bounces, fails to exceed 70 and then breaks its prior low.  It is basically a move to overbought levels and then a lower high below overbought levels.
+
+![Bearish Failure Swing](relative-strength-bearish-failure-swing.png)
+
+
+### See
+
+- [RelativeStrengthIndex](relative-strength-index.ts)
+- http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
 
 ## Simple Moving Average SMA
 
@@ -32,9 +45,9 @@ period is the number of days in the moving window.
 avg = ( ∑ values in period ) / period
 ```
 
-### References
+### See
 
-[SimpleMovingAverage](simple-moving-average.ts)
+- [SimpleMovingAverage](simple-moving-average.ts)
 
 ## Exponential Moving Average EMA
 
@@ -54,9 +67,8 @@ Initialize previousEMA with its SMA.
 
 ### See
 
-[ExponentialMovingAverage](exponential-moving-average.ts)
-
-https://www.compose.com/articles/metrics-maven-calculating-an-exponentially-weighted-moving-average-in-postgresql/
+- [ExponentialMovingAverage](exponential-moving-average.ts)
+- https://www.compose.com/articles/metrics-maven-calculating-an-exponentially-weighted-moving-average-in-postgresql/
 
 ## Moving Average Convergence Divergence MACD
 

@@ -14,7 +14,8 @@ export class PageRequest {
    * @param {string} [sort=''] Column to sort.
    * @param {DIR} [dir=ASC] Sort direction ASC or DESC.
    */
-  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE, public sort: string = '', public dir: DIR = 'ASC') {
+  constructor(public page = PageRequest.DEFAULT_PAGE, public pageSize = PageRequest.DEFAULT_PAGE_SIZE, public sort: string = '',
+              public dir: DIR = 'ASC') {
   }
 
   /**

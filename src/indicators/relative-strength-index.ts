@@ -4,9 +4,8 @@ import {average, Line} from '../math';
 import {FailureSwing} from './failure-swing';
 
 /**
-* http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
-*
-*/
+ *
+ */
 export class RelativeStrengthIndex {
   public values: { date: Date, rsi: number, price: number}[] = [];
   public overboughtThreshold = 70;
@@ -47,7 +46,6 @@ export class RelativeStrengthIndex {
     });
     let avgGains = average(gains);
     let avgLosses = average(losses);
-
     let prevGains = avgGains;
     let prevLosses = avgLosses;
     let prevPrice = _.last(periodPrices);
@@ -70,8 +68,8 @@ export class RelativeStrengthIndex {
         loss = Math.abs(diff);
       }
 
-      gain = ( (prevGains * (this.period - 1) ) + gain) / this.period;
-      loss = ( (prevLosses * (this.period - 1) ) + loss) / this.period;
+      gain = ((prevGains * (this.period - 1)) + gain) / this.period;
+      loss = ((prevLosses * (this.period - 1)) + loss) / this.period;
 
       this.values.push({
         date: d,
@@ -159,11 +157,11 @@ export class RelativeStrengthIndex {
         if(v.rsi < this.oversoldThreshold) {
           bounceAbove = false;
           previousHigh = 0.0;
+          oversold = true;
           pullback = false;
         } else if(v.rsi > previousHigh) {
           if(pullback) {
             failureSwings.push(new FailureSwing(v.price, v.rsi, v.date, true));
-            oversold = false;
             bounceAbove = false;
             previousHigh = 0.0;
             pullback = false;
@@ -176,12 +174,12 @@ export class RelativeStrengthIndex {
       } else if(bounceBelow) {
         if(v.rsi > this.overboughtThreshold) {
           bounceBelow = false;
+          overbought = true;
           previousLow = 0.0;
           pullback = false;
         } else if(v.rsi < previousLow) {
           if(pullback) {
             failureSwings.push(new FailureSwing(v.price, v.rsi, v.date, false));
-            overbought = false;
             bounceBelow = false;
             previousLow = 0.0;
             pullback = false;
@@ -193,8 +191,16 @@ export class RelativeStrengthIndex {
         }
       } else if(oversold) {
         bounceAbove = v.rsi >= this.oversoldThreshold;
+        if(bounceAbove) {
+          oversold = false;
+          previousHigh = v.rsi;
+        }
       } else if(overbought) {
         bounceBelow = v.rsi <= this.overboughtThreshold;
+        if(bounceBelow) {
+          overbought = false;
+          previousLow = v.rsi;
+        }
       } else if(v.rsi > this.overboughtThreshold) {
         overbought = true;
       } else if(v.rsi < this.oversoldThreshold) {

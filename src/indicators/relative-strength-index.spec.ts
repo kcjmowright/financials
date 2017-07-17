@@ -100,7 +100,7 @@ describe('RSI', function() {
     expect(failureSwing[0].bullish).toBe(true);
   });
 
-  xit('should find bearish failure swings', function() {
+  it('should find bearish failure swings', function() {
     let bearishFailureSwingMock = JSON.parse(fs.readFileSync('src/indicators/relative-strength-bearish-failure-swing.mock.json', 'utf8'));
 
     bearishFailureSwingMock.dates = bearishFailureSwingMock.dates.map(function(s) {
@@ -113,9 +113,9 @@ describe('RSI', function() {
     expect(failureSwing).toBeDefined();
     expect(failureSwing.length).toBeTruthy();
     expect(failureSwing[0].bullish).toBe(false);
-    // expect(failureSwing[0].date.toISOString()).toBe('2010-01-26T21:30:00.000Z');
-    // expect(failureSwing[0].rsi).toBe(67.2733);
-    // expect(failureSwing[0].price).toBe(44.85);
+    expect(failureSwing[0].date.toISOString()).toBe('2010-01-27T21:30:00.000Z');
+    expect(failureSwing[0].rsi).toBe(63.601);
+    expect(failureSwing[0].price).toBe(46.89);
   });
 
   // xit('should be overbought', function() {});

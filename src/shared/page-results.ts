@@ -4,6 +4,7 @@ import {DIR, PageRequest} from './page-request';
  * Meta data for encapsulating a collection of page results or type T.
  */
 export class PageResults<T> extends PageRequest {
+
   /**
    * Results length.
    */
