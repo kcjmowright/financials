@@ -1,6 +1,7 @@
 import {MacdResource} from './macd-resource';
 import {RsiResource} from './rsi-resource';
 import {ServerRegistrations} from '../server-registrations';
+import {StochasticOscillatorResource} from './stochastic-oscillator-resource';
 
 /**
  * Registers endpoints for this HAPI plugin.
@@ -11,7 +12,8 @@ import {ServerRegistrations} from '../server-registrations';
 export function register(server, options, next) {
   ServerRegistrations.register(server, [
     MacdResource,
-    RsiResource
+    RsiResource,
+    StochasticOscillatorResource
   ]);
   next();
 }

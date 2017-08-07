@@ -56,7 +56,7 @@ export class Line {
 
   /**
    *
-   * @param line the other line to compare to this line.
+   * @param {Line} line the other line to compare to this line.
    * @return {{a: number, b: number, c: number, d: number, isIdentical: boolean, isParallel: boolean, x: any, y: any}}
    * - a this line's slope.
    * - b other line's slope.

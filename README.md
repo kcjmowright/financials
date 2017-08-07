@@ -123,11 +123,15 @@ REST endpoints.  Default port runs on 9000.
 * GET /macd/{symbol}
 * GET /macd/{symbol}.csv
 * GET /rsi/{symbol}
+* GET /stochastic-oscillator/{symbol}
 
 
 ### Shared
 
-(todo)
+- *`DateUtil`* Utility to convert dates to and from UTC strings.
+- *`PageRequest`* Data object that describes the page number and size and the expected sort and sort direction.
+- *`PageResults`* Data object that extends a `PageRequest` and adds the count of total results.
+
 
 
 
