@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 import {average} from './average';
 
 /**
- *
- * @param values
- * @return {number}
+ * The average of the squared differences from the mean.
+ * @param {number[]} values data.
+ * @return {number} the variance.
  */
 export function variance(values: number[] = []): number {
   let avg = average(values);

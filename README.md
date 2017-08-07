@@ -91,6 +91,40 @@ Functions and classes used in math operations.
 
 (todo)
 
+### Server
+
+REST endpoints.  Default port runs on 9000.
+
+* GET /balance-sheet
+* GET /balance-sheet/{id}
+* GET /cash-flow
+* GET /cash-flow/{id}
+* GET /company
+* GET /company/{id}
+* GET /company/ticker/{ticker}
+* POST /company
+* PUT /company
+* DELETE /company/{id}
+* PUT /company/populate
+* PUT /fundamentals
+* GET /income-statement
+* GET /income-statement/{id}
+* GET /quote/{ticker}
+* GET /quote/{ticker}/latest
+* GET /quote/{symbol}/average-price/{period}
+* GET /quote/{symbol}/average-volume/{period}
+* GET /quote/{symbol}/average-volume-price/{period}
+* GET /quote/top-price-movers/{period}
+* GET /quote/top-volume-movers/{period}
+* POST /quote
+* PUT /quote
+* DELETE /quote/{id}
+* PUT /quote/populate
+* GET /macd/{symbol}
+* GET /macd/{symbol}.csv
+* GET /rsi/{symbol}
+
+
 ### Shared
 
 (todo)

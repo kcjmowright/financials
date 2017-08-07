@@ -1,6 +1,7 @@
 import * as Knex from 'knex';
 import * as fs from 'fs';
 import * as pg from 'pg';
+import * as process from 'process';
 
 /**
  * PG-node has to return strings because Javascript's numbers aren't long enough to handle the big numbers psql can handle.
@@ -15,7 +16,7 @@ pg.types.setTypeParser(PG_DECIMAL_OID, parseFloat);
 pg.types.setTypeParser(PG_BIGINT_OID, parseInt);
 
 const config = JSON.parse(fs.readFileSync('./config/db.json', 'utf8'));
-let env = 'development'; // <= TODO: Change to environmental variable read.
+let env = process.env.NODE_ENV || 'development';
 let knex = Knex(config[env]);
 
 // Migrate to the latest everytime.

@@ -7,54 +7,67 @@ export class GoogleFinanceFinancialsService {
   constructor(public knex: Knex) {
   }
 
-  public fetchFinancials(): Promise {
-    new Promise((resolve, reject) => {
+  /**
+   * Calls google finance to retrieve financial data for each ticker symbol in the DB, parses the response and populates the DB with the result.
+   * @return {Promise}
+   */
+  public populateFinancials(): Promise {
+    return new Promise((resolve, reject) => {
       this.knex('companies').select(['ticker', 'exchange'])
         .orderBy('ticker')
-        .then((results) => {
-          let calls = results.map((result) => futureCall(result.ticker, result.exchange));
+        .then(handleResults, handleError);
 
-          chain(calls, 0);
+      /**
+       * @private
+       * @param results
+       */
+      function handleResults(results) {
+        chain(results.map((result) => deferCall(result.ticker, result.exchange)), 0);
+      }
 
-          /**
-           *
-           * @param c
-           * @param index
-           * @private
-           */
-          function chain(c, index): void {
-            if(index >= c.length) {
-              resolve();
-            } else {
-              c[index]().then(() => chain(c, index + 1), (e) => {
-                console.log(`Error : ${e.message}`);
-                chain(c, index + 1);
-              });
-            }
-          }
-        }, (e) => {
-          reject(e);
+      /**
+       * @private
+       * @param {Error} error
+       */
+      function handleError(error: Error) {
+        reject(error);
+      }
+
+      /**
+       *
+       * @param calls
+       * @param index
+       * @private
+       */
+      function chain(calls, index): void {
+        if(index >= calls.length) {
+          resolve();
+        }
+        calls[index]().then(() => chain(calls, index + 1), (error: Error) => {
+          console.log(`Error : ${error.message}`);
+          chain(calls, index + 1);
         });
-    }).then(
-      () => console.log('Done populating financials.'),
-      e => console.log(`Error populating financials: ${e.message}`)
-    );
+      }
+    });
 
-    function futureCall(symbol: string, exchange: string) {
+    /**
+     * @private
+     * @param symbol
+     * @param exchange
+     * @return {()=>any}
+     */
+    function deferCall(symbol: string, exchange: string) {
       console.log(`queueing ${exchange}:${symbol}`);
       return function() {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => new GoogleFinanceFinancialsStream(symbol, exchange).get((e) => {
-            if(!!e) {
-              console.log(e);
-              resolve();
-              return;
+        return new Promise((resolve) => {
+          setTimeout(() => new GoogleFinanceFinancialsStream(symbol, exchange).get((error) => {
+            if(!!error) {
+              console.log(error);
             }
             resolve();
-          }), 5000);
+          }), 3000); // Delay calls by 3 seconds.
         });
       };
     }
-
   }
 }

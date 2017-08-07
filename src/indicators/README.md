@@ -32,6 +32,16 @@ pulls back, bounces, fails to exceed 70 and then breaks its prior low.  It is ba
 - [RelativeStrengthIndex](relative-strength-index.ts)
 - http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
 
+## Stochastic Oscillator
+
+```
+%K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
+%D = 3-day SMA of %K
+```
+Lowest Low = lowest low for the look-back period
+Highest High = highest high for the look-back period
+%K is multiplied by 100 to move the decimal point two places
+
 ## Simple Moving Average SMA
 
 Average of the last x data points.  As new data points are available then the window shifts adding a new data point to the end and dropping 

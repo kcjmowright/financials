@@ -29,7 +29,8 @@ export class Line {
   }
 
   /**
-   * Calculates the scope of this line.
+   * Calculates the slope of this line.
+   * (y2 - y1) / (x2 - x1);
    * @return {number}
    */
   public slope(): number {
@@ -38,10 +39,19 @@ export class Line {
 
   /**
    * Calculates the length (distance) of this line.
+   * sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
    * @return {number}
    */
   public length(): number {
     return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+  }
+
+  /**
+   * Get the y intercept of `this` line.
+   * @return {number} the y intercept.
+   */
+  public getYIntercept(): number {
+    return this.a.y - (this.slope() * this.a.x);
   }
 
   /**
@@ -59,9 +69,9 @@ export class Line {
    */
   public compareTo(line: Line): any {
     let a = this.slope();
-    let c = this.a.y - (a * this.a.x);
+    let c = this.getYIntercept();
     let b = line.slope();
-    let d = line.a.y - (b * line.a.x);
+    let d = line.getYIntercept();
     let isParallel = a === b;
     let isIdentical = isParallel && c === d;
     let x;
