@@ -55,6 +55,17 @@ export class Line {
   }
 
   /**
+   * Get the function that calculates y for the given x for this line.
+   * @return {(x:any)=>number} Function for `this` line. ( y = m x + b )
+   */
+  public getSlopeInterceptFn() {
+    let m = this.slope();
+    let b = this.getYIntercept();
+
+    return (x) => m * x + b;
+  }
+
+  /**
    *
    * @param {Line} line the other line to compare to this line.
    * @return {{a: number, b: number, c: number, d: number, isIdentical: boolean, isParallel: boolean, x: any, y: any}}

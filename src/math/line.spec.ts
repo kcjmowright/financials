@@ -115,4 +115,13 @@ describe('Line', () => {
       y: undefined
     });
   });
+
+  it('should provide the lines function', () => {
+    let line1 = new Line(13, 11, 15, 26);
+    let fn = line1.getSlopeInterceptFn();
+
+    expect(fn(13)).toEqual(11);
+    expect(fn(14)).toEqual(18.5);
+    expect(fn(15)).toEqual(26);
+  });
 });
