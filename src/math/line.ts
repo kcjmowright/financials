@@ -81,41 +81,74 @@ export class Line {
   /**
    *
    * @param {Line} line the other line to compare to this line.
-   * @return {{a: number, b: number, c: number, d: number, isIdentical: boolean, isParallel: boolean, x: any, y: any}}
-   * - a this line's slope.
-   * - b other line's slope.
-   * - c this line's y intercept.
-   * - d other line's y intercept.
-   * - isIdentical,
-   * - isParallel,
-   * - x the x value of intersection.
-   * - y the y value of intersection.
+   * @return {ILineComparison}
    */
-  public compareTo(line: Line): any {
-    let a = this.slope();
-    let c = this.getYIntercept();
-    let b = line.slope();
-    let d = line.getYIntercept();
-    let isParallel = a === b;
-    let isIdentical = isParallel && c === d;
+  public compareTo(line: Line): ILineComparison {
+    let aSlope = this.slope();
+    let aYIntercept = this.getYIntercept();
+    let bSlope = line.slope();
+    let bYIntercept = line.getYIntercept();
+    let isParallel = aSlope === bSlope;
+    let isIdentical = isParallel && aYIntercept === bYIntercept;
     let x;
     let y;
     let intercept;
 
     if(!isParallel) {
-      x = (d - c ) / (a - b);
-      y = (a * d - b * c) / (a - b);
+      x = (bYIntercept - aYIntercept ) / (aSlope - bSlope);
+      y = (aSlope * bYIntercept - bSlope * aYIntercept) / (aSlope - bSlope);
       intercept = new Point(x, y);
     }
     return {
-      a: a, // this line's slope.
-      b: b, // other line's slope.
-      c: c, // this line's y intercept.
-      d: d, // other line's y intercept.
-      intercept: intercept,
-      isIdentical: isIdentical,
-      isParallel: isParallel
+      aSlope,
+      aYIntercept,
+      bSlope,
+      bYIntercept,
+      intercept,
+      isIdentical,
+      isParallel
     };
   }
 
+}
+
+/**
+ * Describes the comparison of two lines.
+ */
+export interface ILineComparison {
+
+  /**
+   * This line's slope.
+   */
+  aSlope: number;
+
+  /**
+   * This line's y intercept.
+   */
+  aYIntercept: number;
+
+  /**
+   * Other line's slope.
+   */
+  bSlope: number;
+
+  /**
+   * Other line's y intercept.
+   */
+  bYIntercept: number;
+
+  /**
+   * Point of interception between two lines.
+   */
+  intercept?: Point;
+
+  /**
+   * Are these two lines the same?
+   */
+  isIdentical: boolean;
+
+  /**
+   * Are these two lines parallel?
+   */
+  isParallel: boolean;
 }

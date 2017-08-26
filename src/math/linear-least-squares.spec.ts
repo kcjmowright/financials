@@ -51,10 +51,12 @@ describe('Function: linearLeastSquares', () => {
       23,
       46
     ];
-    let line = linearLeastSquares(x, y);
+    let result = linearLeastSquares(x, y);
 
-    expect(line.getYIntercept()).toEqual(17.236363636363635);
-    expect(line.slope()).toEqual(1.5363636363636364);
+    expect(result.line.getYIntercept()).toEqual(17.236363636363635);
+    expect(result.line.slope()).toEqual(1.5363636363636364);
+    expect(result.coefficientsOfDeterminationR2).toEqual(0.2533800567778567);
+    expect(result.stdErrorOfEstimate).toEqual(9.220037467878909);
   });
 
   it('should find the best fitting line for the given set of points', () => {
@@ -71,9 +73,11 @@ describe('Function: linearLeastSquares', () => {
       new Point(10, 23),
       new Point(11, 46)
     ];
-    let line = linearLeastSquares(points);
+    let result = linearLeastSquares(points);
 
-    expect(line.getYIntercept()).toEqual(17.236363636363635);
-    expect(line.slope()).toEqual(1.5363636363636364);
+    expect(result.line.getYIntercept()).toEqual(17.236363636363635);
+    expect(result.line.slope()).toEqual(1.5363636363636364);
+    expect(result.coefficientsOfDeterminationR2).toEqual(0.2533800567778567);
+    expect(result.stdErrorOfEstimate).toEqual(9.220037467878909);
   });
 });

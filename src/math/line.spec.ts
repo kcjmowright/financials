@@ -71,10 +71,10 @@ describe('Line', () => {
     let comparison = line1.compareTo(line2);
 
     expect(comparison).toEqual({
-      a: 2.5,
-      b: 3,
-      c: -6.5,
-      d: -7,
+      aSlope: 2.5,
+      aYIntercept: -6.5,
+      bSlope: 3,
+      bYIntercept: -7,
       intercept: new Point(1, -4),
       isIdentical: false,
       isParallel: false
@@ -87,10 +87,10 @@ describe('Line', () => {
     let comparison = line1.compareTo(line2);
 
     expect(comparison).toEqual({
-      a: 2.5,
-      b: 2.5,
-      c: -6.5,
-      d: -6.5,
+      aSlope: 2.5,
+      aYIntercept: -6.5,
+      bSlope: 2.5,
+      bYIntercept: -6.5,
       intercept: undefined,
       isIdentical: true,
       isParallel: true
@@ -103,10 +103,10 @@ describe('Line', () => {
     let comparison = line1.compareTo(line2);
 
     expect(comparison).toEqual({
-      a: 2.5,
-      b: 2.5,
-      c: -6.5,
-      d: -8,
+      aSlope: 2.5,
+      aYIntercept: -6.5,
+      bSlope: 2.5,
+      bYIntercept: -8,
       intercept: undefined,
       isIdentical: false,
       isParallel: true
