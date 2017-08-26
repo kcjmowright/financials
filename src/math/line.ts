@@ -34,7 +34,12 @@ export class Line {
    * @return {number}
    */
   public slope(): number {
-    return ( this.b.y - this.a.y ) / ( this.b.x - this.a.x );
+    let xD = ( this.b.x - this.a.x );
+
+    if(!xD) {
+      return undefined;
+    }
+    return ( this.b.y - this.a.y ) / xD;
   }
 
   /**
@@ -51,7 +56,12 @@ export class Line {
    * @return {number} the y intercept.
    */
   public getYIntercept(): number {
-    return this.a.y - (this.slope() * this.a.x);
+    let slope = this.slope();
+
+    if(slope === undefined) {
+      return undefined;
+    }
+    return this.a.y - (slope * this.a.x);
   }
 
   /**
@@ -65,6 +75,9 @@ export class Line {
     return (x) => m * x + b;
   }
 
+  public toString() {
+    return `y = ${this.slope()} * x + ${this.getYIntercept()}`;
+  }
   /**
    *
    * @param {Line} line the other line to compare to this line.
@@ -87,20 +100,21 @@ export class Line {
     let isIdentical = isParallel && c === d;
     let x;
     let y;
+    let intercept;
 
     if(!isParallel) {
       x = (d - c ) / (a - b);
       y = (a * d - b * c) / (a - b);
+      intercept = new Point(x, y);
     }
     return {
       a: a, // this line's slope.
       b: b, // other line's slope.
       c: c, // this line's y intercept.
       d: d, // other line's y intercept.
+      intercept: intercept,
       isIdentical: isIdentical,
-      isParallel: isParallel,
-      x: x, // x value of intersection.
-      y: y // y value of intersection.
+      isParallel: isParallel
     };
   }
 

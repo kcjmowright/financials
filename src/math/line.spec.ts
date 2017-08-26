@@ -75,10 +75,9 @@ describe('Line', () => {
       b: 3,
       c: -6.5,
       d: -7,
+      intercept: new Point(1, -4),
       isIdentical: false,
-      isParallel: false,
-      x: 1,
-      y: -4
+      isParallel: false
     });
   });
 
@@ -92,10 +91,9 @@ describe('Line', () => {
       b: 2.5,
       c: -6.5,
       d: -6.5,
+      intercept: undefined,
       isIdentical: true,
-      isParallel: true,
-      x: undefined,
-      y: undefined
+      isParallel: true
     });
   });
 
@@ -109,10 +107,9 @@ describe('Line', () => {
       b: 2.5,
       c: -6.5,
       d: -8,
+      intercept: undefined,
       isIdentical: false,
-      isParallel: true,
-      x: undefined,
-      y: undefined
+      isParallel: true
     });
   });
 
