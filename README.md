@@ -81,6 +81,7 @@ Functions and classes used in math operations.
 
 - average
 - interest
+- least squares (linear regression)
 - line
 - median
 - point
@@ -120,7 +121,8 @@ REST endpoints.  Default port runs on 9000.
 * PUT /quote
 * DELETE /quote/{id}
 * PUT /quote/populate
-* GET /macd/{symbol}
+* GET /linear-regression/{symbol}?limit=x
+* GET /macd/{symbol}?limit=x&period=x
 * GET /macd/{symbol}.csv
 * GET /rsi/{symbol}
 * GET /stochastic-oscillator/{symbol}
