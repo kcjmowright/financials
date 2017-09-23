@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import {RelativeStrengthIndex} from './relative-strength-index';
 
-describe('RSI', function() {
+describe('CLASS: RelativeStrengthIndex', function() {
 
   const rsiMock = JSON.parse(fs.readFileSync('src/indicators/relative-strength-index.mock.json', 'utf8'));
 

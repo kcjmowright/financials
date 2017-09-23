@@ -1,6 +1,6 @@
 import {average} from './average';
 
-describe('Function: average', function() {
+describe('FUNCTION: average', function() {
 
   it('should calculate average of a set of numbers', function() {
     expect(average([
@@ -14,6 +14,20 @@ describe('Function: average', function() {
       8,
       9
     ])).toEqual(5);
+  });
+
+  it('should calculate average of a set of objects', function() {
+    expect(average([
+      { x: 0, y: 1 },
+      { x: 1, y: 2 },
+      { x: 2, y: 3 },
+      { x: 3, y: 4 },
+      { x: 4, y: 5 },
+      { x: 5, y: 6 },
+      { x: 6, y: 7 },
+      { x: 7, y: 8 },
+      { x: 8, y: 9 }
+    ], v => v.y)).toEqual(5);
   });
 
   it('should return undefined if given an empty set', function() {

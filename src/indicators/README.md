@@ -119,6 +119,51 @@ If MACD slope rises dramatically, the 12 day EMA rises faster than the 26 day EM
 
 -------------------
 
+## Calculating Support and Resistance Trend Lines.
+
+https://stackoverflow.com/questions/8587047/support-resistance-algorithm-technical-analysis
+
+Choose a timeframe, say 100 bars, then look for local turning points, or Maxima and Minima.
+ Maxima and Minima can be computed from a smoothed closing price by using the 1st and second derivative (dy/dx and d^2y/dx).
+  Where dy/dx = zero and d^y/dx is positive, you have a minima, when dy/dx = zero and d^2y/dx is negative, you have a maxima.
+
+In practical terms this could be computed by iterating over your smoothed closing price series and looking at three adjacent points.
+ If the points are lower/higher/lower in relative terms then you have a maxima, else higher/lower/higher you have a minima.
+  You may wish to fine-tune this detection method to look at more points (say 5, 7) 
+  and only trigger if the edge points are a certain % away from the centre point.
+   This is similar to the algorithm that the ZigZag indicator uses.
+
+Once you have local maxima and minima,
+ you then want to look for clusters of turning points within a certain distance of each other in the Y-Direction.
+ Take the list of N turning points and compute the Y-distance between it and each of the other discovered turning points.
+  If the distance is less than a fixed constant then you have found two "close" turning points, indicating possible support/resistance.
+
+You could then rank your S/R lines, so two turning points at $20 is less important than three turning points at $20 for instance.
+
+An extension to this would be to compute trendlines. 
+With the list of turning points discovered now take each point in turn and select two other points, trying to fit a straight line equation. 
+If the equation is solvable within a certain error margin, you have a sloping trendline. 
+If not, discard and move on to the next triplet of points.
+
+The reason why you need three at a time to compute trendlines is any two points can be used in the straight line equation. 
+Another way to compute trendlines would be to compute the straight line equation of all pairs of turning points, 
+then see if a third point (or more than one) lies on the same straight line within a margin of error. 
+If 1 or more other points does lie on this line, bingo you have calculated a Support/Resistance trendline.
+
+I hope this helps. No code examples sorry, I'm just giving you some ideas on how it could be done. In summary:
+
+Inputs to the system
+
+Lookback period L (number of bars)
+Closing prices for L bars
+Smoothing factor (to smooth closing price)
+Tolerance (minimum distance between turning points to constitute a match)
+
+Outputs
+
+List of turning points, call them tPoints[] (x,y)
+List of potential trendlines, each with the line equation (y = mx + c)
+
 ## Chart Patterns
 
 Bases for patterns have these quantitative attributes; depth and duration.

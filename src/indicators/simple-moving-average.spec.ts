@@ -1,41 +1,42 @@
 import * as fs from 'fs';
+
 import {average} from '../math';
-import {DateUtil} from '../shared';
-import {SimpleMovingAverage} from './simple-moving-average';
+import {simpleMovingAverage} from './simple-moving-average';
 
-describe('SimpleMovingAverage', () => {
-  const smaMock = JSON.parse(fs.readFileSync('src/indicators/simple-moving-average.mock.json', 'utf8'));
-
-  smaMock.dates = smaMock.dates.map(dateStr => DateUtil.toDate(dateStr));
+describe('FUNCTION: simpleMovingAverage', () => {
+  const mock = JSON.parse(fs.readFileSync('src/indicators/simple-moving-average.mock.json', 'utf8'));
 
   it('should calculate a 10 day moving average', () => {
-    let sma = new SimpleMovingAverage(smaMock.dates, smaMock.prices, 10);
+    let averages = simpleMovingAverage(mock, 10);
 
-    expect(sma.period).toEqual(10);
-    expect(sma.averages.length).toEqual(smaMock.dates.length - 9);
-    expect(sma.averages[0].date).toEqual(smaMock.dates[9]);
-    expect(sma.averages[0].average).toEqual(average(smaMock.prices.slice(0, 10)));
-    expect(sma.averages[1].date).toEqual(smaMock.dates[10]);
-    expect(sma.averages[1].average).toEqual(average(smaMock.prices.slice(1, 11)));
-    expect(sma.averages[2].date).toEqual(smaMock.dates[11]);
-    expect(sma.averages[2].average).toEqual(average(smaMock.prices.slice(2, 12)));
-    expect(sma.averages[3].date).toEqual(smaMock.dates[12]);
-    expect(sma.averages[3].average).toEqual(average(smaMock.prices.slice(3, 13)));
-    expect(sma.averages[4].date).toEqual(smaMock.dates[13]);
-    expect(sma.averages[4].average).toEqual(average(smaMock.prices.slice(4, 14)));
-    expect(sma.averages[5].date).toEqual(smaMock.dates[14]);
-    expect(sma.averages[5].average).toEqual(average(smaMock.prices.slice(5, 15)));
+    expect(averages.length).toEqual(mock.length - 9);
+    expect(averages[0].x).toEqual(mock[9].x);
+    expect(averages[0].y).toEqual(average(mock.slice(0, 10), m => m.y));
+    expect(averages[1].x).toEqual(mock[10].x);
+    expect(averages[1].y).toEqual(average(mock.slice(1, 11), m => m.y));
+    expect(averages[2].x).toEqual(mock[11].x);
+    expect(averages[2].y).toEqual(average(mock.slice(2, 12), m => m.y));
+    expect(averages[3].x).toEqual(mock[12].x);
+    expect(averages[3].y).toEqual(average(mock.slice(3, 13), m => m.y));
+    expect(averages[4].x).toEqual(mock[13].x);
+    expect(averages[4].y).toEqual(average(mock.slice(4, 14), m => m.y));
+    expect(averages[5].x).toEqual(mock[14].x);
+    expect(averages[5].y).toEqual(average(mock.slice(5, 15), m => m.y));
   });
 
   it('should throw an error if period is greater than the number of data points', () => {
     expect(function() {
-      return new SimpleMovingAverage(smaMock.dates, smaMock.prices, smaMock.dates.length + 1);
+      return simpleMovingAverage(mock, mock.length + 1);
     }).toThrowError(/Not enough data\./);
   });
 
-  it('should throw and error if dates and values data points length do NOT match', () => {
+  it('should throw an error if values is null or undefined', () => {
     expect(function() {
-      return new SimpleMovingAverage(smaMock.dates.slice(0, 5), smaMock.prices, 10);
-    }).toThrowError(/Date and value data points are unequal in length\./);
+      return simpleMovingAverage(null, 10);
+    }).toThrowError(/Not enough data\./);
+
+    expect(function() {
+      return simpleMovingAverage(undefined, 10);
+    }).toThrowError(/Not enough data\./);
   });
 });

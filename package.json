@@ -5,11 +5,12 @@
   "main": "lib/index",
   "types": "lib/index",
   "scripts": {
-    "build:live": "nodemon --exec ts-node ./lib/index.js -- ./src/**/*.ts",
+    "build:live": "nodemon -V -w ./config -w ./src -w ./web --exec ts-node ./lib/index.js",
     "clean": "rm -fR ./lib ./coverage",
     "start": "npm run build:live",
     "start-server": "node lib/index.js",
-    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc && istanbul cover --report json jasmine lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
+    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc && istanbul cover --report json jasmine lib/*.spec.js lib/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html",
+    "test-no-coverage": "tslint -c tslint.json 'src/**/*.ts' && tsc && jasmine  lib/*.spec.js lib/**/*.spec.js"
   },
   "author": "jwright",
   "license": "BSD-Source-Code",
@@ -19,6 +20,7 @@
     "@types/node": "^7.0.31",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
+    "jasmine-spec-reporter": "^4.2.1",
     "nodemon": "^1.11.0",
     "remap-istanbul": "^0.9.5",
     "through": "^2.3.8",

@@ -5,7 +5,7 @@ import {DiscountedCashFlow} from './discounted-cash-flow';
 import {Fundamentals} from '../company/fundamentals';
 import {ForecastPeriod} from './forecast-period';
 
-describe('Class: DiscountedCashFlow', function() {
+describe('CLASS: DiscountedCashFlow', function() {
 
   const forecastPeriodMock = JSON.parse(fs.readFileSync('src/discounted-cash-flow/forecast-period.mock.json', 'utf8'));
   const discountedCashFlowMock = JSON.parse(fs.readFileSync('src/discounted-cash-flow/discounted-cash-flow.mock.json', 'utf8'));

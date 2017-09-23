@@ -1,6 +1,6 @@
 import {sum} from './sum';
 
-describe('Function: sum', () => {
+describe('FUNCTION: sum', () => {
 
   it('should sum a set of numbers', () =>
     expect(sum([
@@ -42,5 +42,8 @@ describe('Function: sum', () => {
   });
 
   it('should return undefined if given and empty set', () => expect(sum([])).not.toBeDefined());
+
+  it('should return undefined if given an object array without a callback',
+    () => expect(sum([{x: 0, y: 1}])).not.toBeDefined());
 
 });

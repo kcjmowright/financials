@@ -91,7 +91,7 @@ export class MacdResource {
           response.code(404);
           return 'Ticker symbol not found.';
         }
-        return result.values.map(v => {
+        return result.results.map(v => {
           return `"${DateUtil.toISODateString(v.date)}", ${v.macdSlope}, ${v.macd}, ${v.distance}, ${v.histogram}, ${v.longEMA}, ${v.shortEMA}, ${v.signal}, ${v.value}, ${v.valueSlope}\n`;
         }).join('');
       }, e => {

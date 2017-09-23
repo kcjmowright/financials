@@ -1,23 +1,17 @@
 import * as fs from 'fs';
-import {DateUtil} from '../shared';
 import {MovingAverageConvergenceDivergence} from './moving-average-convergence-divergence';
 
-describe('MovingAverageConvergenceDivergence', () => {
+describe('CLASS: MovingAverageConvergenceDivergence', () => {
   const macdMock = JSON.parse(fs.readFileSync('src/indicators/moving-average-convergence-divergence.mock.json', 'utf8'));
 
-  beforeEach(function() {
-    this.dates = macdMock.map(datum => DateUtil.toDateTime(datum.date));
-    this.values = macdMock.map(datum => datum.value);
-  });
-
   it('should calculate macd', function() {
-    let macd = new MovingAverageConvergenceDivergence(this.dates, this.values);
+    let macd = new MovingAverageConvergenceDivergence(macdMock);
 
     expect(macd).toBeDefined();
     expect(macd.longPeriod).toBe(26);
     expect(macd.shortPeriod).toBe(12);
     expect(macd.signalPeriod).toBe(9);
-    expect(macd.values.length).toBe(this.dates.length - macd.longPeriod + 1);
+    expect(macd.results.length).toBe(macdMock.length - macd.longPeriod + 1);
 
     expect(macd.signalLineCrossovers[0].date).toEqual(new Date('2017-03-24T20:00:00.000Z'));
     expect(macd.signalLineCrossovers[0].bullish).toBe(true);
@@ -34,11 +28,17 @@ describe('MovingAverageConvergenceDivergence', () => {
     expect(macd.centerLineCrossovers[2].bullish).toBe(true);
   });
 
-  it('should throw and error if dates and values data points length do NOT match', function() {
-    let self = this;
+  it('should throw an error if `values` are null, undefined or length of `values` is 0', function() {
+    expect(function() {
+      return new MovingAverageConvergenceDivergence(null);
+    }).toThrowError(/Not enough data/);
 
     expect(function() {
-      return new MovingAverageConvergenceDivergence(self.dates.slice(0, 5), self.values);
-    }).toThrowError(/Date and value data points are unequal in length\./);
+      return new MovingAverageConvergenceDivergence(undefined);
+    }).toThrowError(/Not enough data/);
+
+    expect(function() {
+      return new MovingAverageConvergenceDivergence([]);
+    }).toThrowError(/Not enough data/);
   });
 });

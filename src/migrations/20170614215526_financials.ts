@@ -21,11 +21,11 @@ export function up(knex: Knex): Promise<any> {
       table.string('ticker')
         .references('ticker')
         .inTable('companies');
-      table.timestamp('date');
+      table.timestamp('x'); // <= price date
       table.decimal('open', 8, 4);
       table.decimal('high', 8, 4);
       table.decimal('low', 8, 4);
-      table.decimal('close', 8, 4);
+      table.decimal('y', 8, 4); // <= price
       table.bigInteger('volume');
       table.decimal('changed', 8, 4);
       table.decimal('changep', 8, 4);

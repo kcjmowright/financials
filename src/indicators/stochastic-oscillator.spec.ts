@@ -1,7 +1,6 @@
 import * as parse from 'csv-parse/lib/sync';
 import * as fs from 'fs';
 
-import {DateUtil} from '../shared';
 import {Quote} from '../company/quote';
 import {StochasticOscillator} from './stochastic-oscillator';
 
@@ -25,10 +24,10 @@ describe('CLASS: StochasticOscillator', () => {
     rows.forEach(row => {
       let quote = new Quote();
 
-      quote.date = row.date;
+      quote.x = row.date;
       quote.high = row.high;
       quote.low = row.low;
-      quote.close = row.close;
+      quote.y = row.close;
       quotes.push(quote);
       expected.push(row);
     });
@@ -42,7 +41,7 @@ describe('CLASS: StochasticOscillator', () => {
     expect(stochasticOscillator.quotes).toEqual([]);
   });
 
-  it('Should calculate a 14 day stochastic oscillator', () => {
+  it('should calculate a 14 day stochastic oscillator', () => {
     let stochasticOscillator = new StochasticOscillator(quotes);
 
     expect(stochasticOscillator.values.length).toEqual(expected.length - stochasticOscillator.period + 1);
@@ -54,7 +53,7 @@ describe('CLASS: StochasticOscillator', () => {
         expect(value.d).toBe(expectedValue.d);
       }
       expect(value.k).toEqual(expectedValue.k);
-      expect(value.date).toEqual(DateUtil.toDate(expectedValue.date));
+      expect(value.date).toEqual(expectedValue.date);
     });
   });
 });

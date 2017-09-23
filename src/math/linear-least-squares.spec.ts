@@ -4,7 +4,7 @@ import {Point} from './point';
 /**
  * Check answers at https://cgwb.nci.nih.gov/cgwbreg.html
  */
-describe('Function: linearLeastSquares', () => {
+describe('FUNCTION: linearLeastSquares', () => {
 
   it('should throw error if first argument is undefined or null or not an array', () => {
     expect(() => linearLeastSquares(undefined)).toThrowError();

@@ -1,11 +1,11 @@
-import {ExponentialMovingAverage} from './exponential-moving-average';
-import {Line} from '../math';
+import {exponentialMovingAverage} from './exponential-moving-average';
+import {Line, Point} from '../math';
 
 /**
  *
  */
 export class MovingAverageConvergenceDivergence {
-  public values: {
+  public results: {
     date: Date,
     distance: number,
     histogram?: number,
@@ -22,30 +22,29 @@ export class MovingAverageConvergenceDivergence {
 
   /**
    *
-   * @param {Date[]} dates
-   * @param {number[]} values
+   * @param {Point[]} values
    * @param {number} longPeriod
    * @param {number} shortPeriod
    * @param {number} signalPeriod
    */
-  constructor(dates: Date[], values: number[], public longPeriod: number = 26, public shortPeriod: number = 12,
+  constructor(values: Point[], public longPeriod: number = 26, public shortPeriod: number = 12,
               public signalPeriod: number = 9) {
+    if(!values || values.length === 0) {
+      throw new Error('Not enough data');
+    }
     if(shortPeriod >= longPeriod) {
       throw new Error('Shorter ema period is greater than the longer EMA period.');
     }
-    if (dates.length !== values.length) {
-      throw new Error('Date and value data points are unequal in length.');
-    }
-    let longEMA = new ExponentialMovingAverage(dates, values, longPeriod).averages;
-    let shortEMA = new ExponentialMovingAverage(dates, values, shortPeriod).averages.slice(longPeriod - shortPeriod);
-    let prevMacd = shortEMA[0].average - longEMA[0].average;
-    let prevValue = values[0];
+    let longEMA = exponentialMovingAverage(values, longPeriod);
+    let shortEMA = exponentialMovingAverage(values, shortPeriod).slice(longPeriod - shortPeriod);
+    let prevMacd = shortEMA[0].y - longEMA[0].y;
+    let prevValue = values[0].y;
 
     this.signalLineCrossovers = [];
     this.centerLineCrossovers = [];
-    this.values = longEMA.map((avgLonger, idx) => {
-      let macd = shortEMA[idx].average - avgLonger.average;
-      let value = avgLonger.value;
+    this.results = longEMA.map((avgLonger, idx) => {
+      let macd = shortEMA[idx].y - avgLonger.y;
+      let value = values[longPeriod + idx - 1].y;
       let dist = new Line(0, macd, 0, value);
       let macdSlope = new Line(0, prevMacd, 1, macd);
       let valueSlope = new Line(0, prevValue, 1, value);
@@ -53,13 +52,13 @@ export class MovingAverageConvergenceDivergence {
       prevMacd = macd;
       prevValue = value;
       return {
-        date: new Date(avgLonger.date.getTime()),
+        date: new Date(avgLonger.x),
         distance: dist.length(),
         histogram: undefined,
-        longEMA: avgLonger.average,
+        longEMA: avgLonger.y,
         macd: macd,
         macdSlope: macdSlope.slope(),
-        shortEMA: shortEMA[idx].average,
+        shortEMA: shortEMA[idx].y,
         signal: undefined,
         value: value,
         valueSlope: valueSlope.slope()
@@ -67,28 +66,28 @@ export class MovingAverageConvergenceDivergence {
     });
     let prevAboveSignal = null;
     let prevAboveCenter = null;
-    let signalLine = new ExponentialMovingAverage(this.values.map(v => v.date), this.values.map(v => v.macd), signalPeriod).averages;
+    let signalLine = exponentialMovingAverage(this.results.map(v => new Point(v.date.getTime(), v.macd)), signalPeriod);
 
     signalLine.forEach((signalValue, idx) => {
-      let value = this.values[idx + signalPeriod - 1];
+      let value = this.results[idx + signalPeriod - 1];
       let aboveSignal;
       let aboveCenter;
 
-      value.signal = signalValue.average;
-      value.histogram = value.macd - signalValue.average;
+      value.signal = signalValue.y;
+      value.histogram = value.macd - signalValue.y;
       aboveSignal = value.macd > value.signal;
       aboveCenter = value.macd > 0;
       if(prevAboveSignal !== null) {
         if(prevAboveSignal !== aboveSignal) {
           this.signalLineCrossovers.push({
             bullish: aboveSignal,
-            date: value.date
+            date: new Date(value.date)
           });
         }
         if(prevAboveCenter !== aboveCenter) {
           this.centerLineCrossovers.push({
             bullish: aboveCenter,
-            date: value.date
+            date: new Date(value.date)
           });
         }
       }

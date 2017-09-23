@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import {ForecastPeriod} from './forecast-period';
 
-describe('Class: ForecastPeriod', function() {
+describe('CLASS: ForecastPeriod', function() {
 
   const mock = JSON.parse(fs.readFileSync('src/discounted-cash-flow/forecast-period.mock.json', 'utf8'));
 

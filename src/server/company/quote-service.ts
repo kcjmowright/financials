@@ -36,13 +36,13 @@ export class QuoteService {
       if(!endDate) {
         endDate = new Date();
       }
-      queryBuilder = queryBuilder.whereBetween('date', [ startDate, endDate ]);
+      queryBuilder = queryBuilder.whereBetween('x', [ startDate, endDate ]);
     }
 
     return queryBuilder
-      .select('id', 'ticker', 'date', 'open', 'high', 'low',
-        'close', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
-      .orderBy('date' , page.dir)
+      .select('id', 'ticker', 'x', 'open', 'high', 'low',
+        'y', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
+      .orderBy('x' , page.dir)
       .offset(page.getOffset())
       .limit(page.pageSize)
       .then((results) => {
@@ -51,11 +51,11 @@ export class QuoteService {
 
           quote.id = r.id;
           quote.ticker = r.ticker;
-          quote.date = DateUtil.toISODateTimeString(r.date);
+          quote.x = r.x.getTime();
           quote.open = r.open;
           quote.high = r.high;
           quote.low = r.low;
-          quote.close = r.close;
+          quote.y = r.y;
           quote.volume = r.volume;
           quote.changed = r.changed;
           quote.changep = r.changep;
@@ -69,10 +69,10 @@ export class QuoteService {
         });
 
         if(!!startDate) {
-          countQuery = countQuery.whereBetween('date', [ startDate, endDate ]);
+          countQuery = countQuery.whereBetween('x', [ startDate, endDate ]);
         }
         return countQuery.then((r) => {
-          return new PageResults(list, r[0].count, page.page, page.pageSize, 'date', page.dir);
+          return new PageResults(list, r[0].count, page.page, page.pageSize, 'x', page.dir);
         });
       });
   }
@@ -90,9 +90,9 @@ export class QuoteService {
       .where({
         ticker: symbol.toUpperCase()
       })
-      .select('id', 'ticker', 'date', 'open', 'high', 'low',
-        'close', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
-      .orderBy('date', 'desc')
+      .select('id', 'ticker', 'x', 'open', 'high', 'low',
+        'y', 'volume', 'changed', 'changep', 'adjclose', 'tradeval', 'tradevol')
+      .orderBy('x', 'desc')
       .limit(1)
       .then((result) => {
         if(!result.length) {
@@ -103,11 +103,11 @@ export class QuoteService {
 
         quote.id = r.id;
         quote.ticker = r.ticker;
-        quote.date = DateUtil.toISODateTimeString(r.date);
+        quote.x = r.x.getTime();
         quote.open = r.open;
         quote.high = r.high;
         quote.low = r.low;
-        quote.close = r.close;
+        quote.y = r.y;
         quote.volume = r.volume;
         quote.changed = r.changed;
         quote.changep = r.changep;
@@ -137,13 +137,13 @@ export class QuoteService {
       .where({
         ticker: symbol
       })
-      .select('close')
-      .orderBy('date', 'desc')
+      .select('y')
+      .orderBy('x', 'desc')
       .limit(period)
       .as('period_entries');
 
     return this.knex.from(periodEntries)
-      .avg('close')
+      .avg('y')
       .then((results) => {
         if(!results.length) {
           return null;
@@ -151,8 +151,8 @@ export class QuoteService {
         let avg = results[0].avg;
 
         return this.knex
-          .raw(`select date, close, close::decimal/${avg} as ratio ` +
-            `from quotes where ticker = ? order by date desc limit ?`, [symbol, period])
+          .raw(`select x, y, y::decimal/${avg} as ratio ` +
+            `from quotes where ticker = ? order by x desc limit ?`, [symbol, period])
           .then(avgPriceRatios => {
             if(!avgPriceRatios.rows.length) {
               return null;
@@ -161,8 +161,8 @@ export class QuoteService {
               averagePrice: avg,
               prices: avgPriceRatios.rows.map(row => {
                 return {
-                  close: row.close,
-                  date: DateUtil.toISODateTimeString(row.date),
+                  date: DateUtil.toISODateTimeString(row.x),
+                  price: row.y,
                   ratio: row.ratio
                 };
               }),
@@ -192,7 +192,7 @@ export class QuoteService {
         ticker: symbol
       })
       .select('volume')
-      .orderBy('date', 'desc')
+      .orderBy('x', 'desc')
       .limit(period)
       .as('period_entries');
 
@@ -205,8 +205,8 @@ export class QuoteService {
         let avg = results[0].avg;
 
         return this.knex
-          .raw(`select date, volume, volume::decimal/${avg} as ratio ` +
-            `from quotes where ticker = ? order by date desc limit ?`, [symbol, period])
+          .raw(`select x, volume, volume::decimal/${avg} as ratio ` +
+            `from quotes where ticker = ? order by x desc limit ?`, [symbol, period])
           .then(avgVolumeRatios => {
             if(!avgVolumeRatios.rows.length) {
               return null;
@@ -216,7 +216,7 @@ export class QuoteService {
               symbol: symbol,
               volumes: avgVolumeRatios.rows.map(row => {
                 return {
-                  date: DateUtil.toISODateTimeString(row.date),
+                  date: DateUtil.toISODateTimeString(row.x),
                   ratio: row.ratio,
                   volume: row.volume
                 };
@@ -240,15 +240,15 @@ export class QuoteService {
       minPrice = 0;
     }
     return this.knex.raw(`with last_x as (
-      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}
+      select q.x as x from quotes q where ticker = 'A' order by q.x desc limit ${period}
     ),
     ticker_with_avg_close as (
-      select q.ticker, avg(q.close) as avg_close
-      from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
+      select q.ticker, avg(q.y) as avg_close
+      from quotes q where q.x between (select min(x) from last_x) and CURRENT_DATE group by q.ticker
     )
-    select q.ticker, q.date, q.close, q.volume, a.avg_close as averageClose, (q.close::decimal/a.avg_close) as ratio
-    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close >= :min_price and a.avg_close > 0 AND q.date
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
+    select q.ticker, q.x, q.y, q.volume, a.avg_close as averageClose, (q.y::decimal/a.avg_close) as ratio
+    from quotes q inner join ticker_with_avg_close a on q.ticker = a.ticker where a.avg_close >= :min_price and a.avg_close > 0 AND q.x
+    in (select last_x.x from last_x limit 3) order by ratio desc limit 50`, {
       min_price: minPrice
     }).then(result => {
       if(!result.rows.length) {
@@ -272,15 +272,15 @@ export class QuoteService {
       period = 22;
     }
     return this.knex.raw(`with last_x as (
-      select q.date as date from quotes q where ticker = 'A' order by q.date desc limit ${period}
+      select q.x as x from quotes q where ticker = 'A' order by q.x desc limit ${period}
     ),
     ticker_with_avg_volume as (
       select q.ticker, avg(q.volume) as avg_volume
-      from quotes q where q.date between (select min(date) from last_x) and CURRENT_DATE group by q.ticker
+      from quotes q where q.x between (select min(x) from last_x) and CURRENT_DATE group by q.ticker
     )
-    select q.ticker, q.date, q.close, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio
-    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where q.close >= :min_price and a.avg_volume > 0 AND q.date
-    in (select last_x.date from last_x limit 3) order by ratio desc limit 50`, {
+    select q.ticker, q.x, q.y, q.volume, a.avg_volume as averageVolume, (q.volume::decimal/a.avg_volume) as ratio
+    from quotes q inner join ticker_with_avg_volume a on q.ticker = a.ticker where q.y >= :min_price and a.avg_volume > 0 AND q.x
+    in (select last_x.x from last_x limit 3) order by ratio desc limit 50`, {
       min_price: minPrice
     }).then(result => {
       if(!result.rows.length) {
@@ -309,24 +309,24 @@ export class QuoteService {
     }
     return this.knex.raw(
       `with last_x as (
-        select q.date as date from quotes q where ticker = :symbol order by q.date desc limit ${period}
+        select q.x as x from quotes q where ticker = :symbol order by q.x desc limit ${period}
       ),
       ticker_with_avg_close as (
-        select q.ticker, avg(q.close) as avg_close from quotes q
-        where q.ticker = :symbol and q.date between (select min(date) from last_x)
+        select q.ticker, avg(q.y) as avg_close from quotes q
+        where q.ticker = :symbol and q.x between (select min(x) from last_x)
         AND CURRENT_DATE group by q.ticker order by avg_close desc
       ),
       ticker_with_avg_volume as (
         select q.ticker, avg(q.volume) as avg_volume from quotes q
-        where q.ticker = :symbol and q.date between (select min(date) from last_x)
+        where q.ticker = :symbol and q.x between (select min(x) from last_x)
         AND CURRENT_DATE group by q.ticker order by avg_volume desc
       )
-      select q.ticker, q.date, q.close, q.volume, av.avg_volume, ac.avg_close,
-        (q.volume::decimal/av.avg_volume) as volumeratio, (q.close::decimal/ac.avg_close) as closeratio
+      select q.ticker, q.x, q.y, q.volume, av.avg_volume, ac.avg_close,
+        (q.volume::decimal/av.avg_volume) as volumeratio, (q.y::decimal/ac.avg_close) as closeratio
         from quotes q
         inner join ticker_with_avg_volume av on q.ticker = av.ticker
         inner join ticker_with_avg_close ac on av.ticker = ac.ticker
-        where q.date in (select last_x.date from last_x) order by q.date desc`, {
+        where q.x in (select last_x.x from last_x) order by q.x desc`, {
         symbol: symbol.toUpperCase()
       })
       .then(result => {
@@ -339,8 +339,8 @@ export class QuoteService {
           period: period,
           quotes: result.rows.map(row => {
             return {
-              date: DateUtil.toISODateTimeString(row.date),
-              price: row.close,
+              date: DateUtil.toISODateTimeString(row.x),
+              price: row.y,
               priceRatio: row.closeratio,
               volume: row.volume,
               volumeRatio: row.volumeratio
@@ -364,15 +364,15 @@ export class QuoteService {
       adjclose: quote.adjclose,
       changed: quote.changed,
       changep: quote.changep,
-      close: quote.close,
-      date: DateUtil.toDateTime(quote.date),
       high: quote.high,
       low: quote.low,
       open: quote.open,
       ticker: quote.ticker.toUpperCase(),
       tradeval: quote.tradeval,
       tradevol: quote.tradevol,
-      volume: quote.volume
+      volume: quote.volume,
+      x: new Date(quote.x),
+      y: quote.y,
     }).then((resp) => {
       quote.id = resp[0];
       return quote;
@@ -394,15 +394,15 @@ export class QuoteService {
       adjclose: quote.adjclose,
       changed: quote.changed,
       changep: quote.changep,
-      close: quote.close,
-      date: DateUtil.toDateTime(quote.date),
       high: quote.high,
       low: quote.low,
       open: quote.open,
       ticker: quote.ticker.toUpperCase(),
       tradeval: quote.tradeval,
       tradevol: quote.tradevol,
-      volume: quote.volume
+      volume: quote.volume,
+      x: new Date(quote.x),
+      y: quote.y
     });
   }
 

@@ -12,7 +12,7 @@ import {Line} from './line';
  * @return {ILinearLeastSquares}
  */
 export function linearLeastSquares(valuesX: number[] | Point[], valuesY?: number[]): ILinearLeastSquares {
-  if(!valuesX || !Array.isArray(valuesX)) {
+  if(valuesX === undefined || valuesX === null || !Array.isArray(valuesX)) {
     throw new Error('Invalid arguments');
   }
   if(valuesX.length === 0) {

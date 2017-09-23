@@ -1,7 +1,7 @@
 import {Line} from './line';
 import {Point} from './point';
 
-describe('Line', () => {
+describe('CLASS: Line', () => {
 
   it('should allow 2 Point instances to be passed to the constructor', () => {
     let line = new Line(new Point(0, 1), new Point(1, 2));
@@ -53,6 +53,24 @@ describe('Line', () => {
     let line2 = new Line(3, 2, 5, 8);
 
     expect(line2.slope()).toBe(3);
+  });
+
+  it('should return undefined for delta x of 0', () => {
+    let line1 = new Line(3, 1, 3, 2);
+
+    expect(line1.slope()).not.toBeDefined();
+  });
+
+  it('should calculate the y intercept', () => {
+    let line1 = new Line(3, 2, 5, 8);
+
+    expect(line1.getYIntercept()).toBe(-7);
+  });
+
+  it('should return undefined for y intercept if slope is undefined', () => {
+    let line1 = new Line(3, 1, 3, 2);
+
+    expect(line1.getYIntercept()).not.toBeDefined();
   });
 
   it('should calculate the length', () => {
@@ -120,5 +138,11 @@ describe('Line', () => {
     expect(fn(13)).toEqual(11);
     expect(fn(14)).toEqual(18.5);
     expect(fn(15)).toEqual(26);
+  });
+
+  it('should return a string representation of the line', () => {
+    let line = new Line(3, 1, 5, 6);
+
+    expect(line.toString()).toEqual('y = 2.5 * x + -6.5');
   });
 });

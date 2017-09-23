@@ -1,7 +1,7 @@
-import {Quote} from '../company/quote';
 import * as _ from 'lodash';
-import {DateUtil} from '../shared';
-import {average} from '../math/average';
+
+import {Quote} from '../company';
+import {average} from '../math';
 
 /**
  * k = (Most Recent Price - Period Low)/(Period High - Period Low) * 100
@@ -15,7 +15,7 @@ export class StochasticOscillator {
   /**
    * The calculated values.
    */
-  public values: { date: Date, k: number, d: number }[];
+  public values: { date: number, k: number, d: number }[];
 
   /**
    *
@@ -39,8 +39,8 @@ export class StochasticOscillator {
         let quote = _.last(slice);
         let value = {
           d: undefined,
-          date: DateUtil.toDate(quote.date),
-          k: (quote.close - min) / (max - min) * 100.0
+          date: quote.x,
+          k: (quote.y - min) / (max - min) * 100.0
         };
 
         this.values.push(value);
@@ -63,8 +63,8 @@ export class StochasticOscillator {
       let [min, max] = this.calculateMinMax(slice);
       let value = {
         d: undefined,
-        date: DateUtil.toDate(quote.date),
-        k: (quote.close - min) / (max - min) * 100
+        date: quote.x,
+        k: (quote.y - min) / (max - min) * 100
       };
 
       this.values.push(value);

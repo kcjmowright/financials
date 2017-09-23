@@ -1,6 +1,6 @@
 import {Interest} from './interest';
 
-describe('Class: Interest', function() {
+describe('CLASS: Interest', function() {
 
   it('should calculate compound interest', function() {
     expect(+Interest.compounded(100.0, 0.03, 1, 5).toFixed(4)).toEqual(15.9274);

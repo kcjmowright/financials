@@ -18,15 +18,15 @@ export class QuoteDbWritable extends Writable {
           adjclose: isNaN(quote.adjclose) ? null : quote.adjclose,
           changed: isNaN(quote.changed) ? null : quote.changed,
           changep: isNaN(parseFloat(quote.changep)) ? null : ( parseFloat(quote.changep) / 100.0 ),
-          close: isNaN(quote.close) ? null : quote.close,
-          date: moment(`${quote.date}T20:00:00-0000`).toDate(),
           high: isNaN(quote.high) ? null : quote.high,
           low: isNaN(quote.low) ? null : quote.low,
           open: isNaN(quote.open) ? null : quote.open,
           ticker: symbol.toUpperCase(),
           tradeval: isNaN(quote.tradeval) ? null : quote.tradeval,
           tradevol: isNaN(quote.tradevol) ? null : quote.tradevol,
-          volume: isNaN(quote.volume) ? null : quote.volume
+          volume: isNaN(quote.volume) ? null : quote.volume,
+          x: moment(`${quote.date}T20:00:00-0000`).toDate(),
+          y: isNaN(quote.close) ? null : quote.close
         }).then(() => next(), (e) => {
           console.log(e);
           next();

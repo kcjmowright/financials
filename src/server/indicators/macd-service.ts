@@ -32,7 +32,7 @@ export class MacdService {
         return null;
       }
       results = results.reverse();
-      return new MovingAverageConvergenceDivergence(results.map(data => data.date), results.map(data => data.close), longPeriod,
+      return new MovingAverageConvergenceDivergence(results, longPeriod,
         shortPeriod, signalPeriod);
     });
   }

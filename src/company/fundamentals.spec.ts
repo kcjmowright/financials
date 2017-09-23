@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import {average} from '../math';
 import {Fundamentals} from './fundamentals';
 
-describe('Class: Fundamentals', function() {
+describe('CLASS: Fundamentals', function() {
 
   const mock = JSON.parse(fs.readFileSync('src/company/fundamentals.mock.json', 'utf8'));
 

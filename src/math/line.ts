@@ -66,13 +66,13 @@ export class Line {
 
   /**
    * Get the function that calculates y for the given x for this line.
-   * @return {(x:any)=>number} Function for `this` line. ( y = m x + b )
+   * @return {(x: number)=>number} Function for `this` line. ( y = m x + b )
    */
-  public getSlopeInterceptFn() {
+  public getSlopeInterceptFn(): Function {
     let m = this.slope();
     let b = this.getYIntercept();
 
-    return (x) => m * x + b;
+    return (x: number) => m * x + b;
   }
 
   public toString() {

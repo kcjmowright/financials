@@ -1,7 +1,7 @@
 import {knex} from '../db';
 import {Company} from '../../company';
 import {CompanyService} from './company-service';
-import {PageRequest, PageResults} from '../../shared';
+import {PageRequest} from '../../shared';
 import {Promise} from 'bluebird';
 import Route from '../route.decorator';
 
