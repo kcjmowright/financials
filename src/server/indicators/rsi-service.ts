@@ -22,14 +22,14 @@ export class RsiService {
     if(!symbol) {
       return Promise.reject(new Error('Invalid ticker symbol.'));
     }
-    return this.knex('quotes').select('close', 'date').where({
+    return this.knex('quotes').select('x', 'y').where({
       ticker: symbol.toUpperCase()
-    }).orderBy('date', 'desc').limit(limit).then((results) => {
+    }).orderBy('x', 'desc').limit(limit).then((results) => {
       if(!results.length) {
         return null;
       }
       results = results.reverse();
-      let rsi = new RelativeStrengthIndex(results.map(data => data.close), results.map(data => data.date), period);
+      let rsi = new RelativeStrengthIndex(results.map(data => data.y), results.map(data => data.x), period);
 
       return {
         failureSwings: rsi.findFailureSwings(),

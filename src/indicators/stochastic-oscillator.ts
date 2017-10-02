@@ -4,7 +4,7 @@ import {Quote} from '../company';
 import {average} from '../math';
 
 /**
- * k = (Most Recent Price - Period Low)/(Period High - Period Low) * 100
+ * k = (Most Recent Price - Period Low) / (Period High - Period Low) * 100
  *
  * Where:
  *  k = the current calculated value

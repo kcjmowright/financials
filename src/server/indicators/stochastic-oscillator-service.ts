@@ -22,9 +22,9 @@ export class StochasticOscillatorService {
     if(!symbol) {
       return Promise.reject(new Error('Invalid ticker symbol.'));
     }
-    return this.knex('quotes').select('close', 'high', 'low', 'date').where({
+    return this.knex('quotes').select('x', 'y', 'high', 'low').where({
       ticker: symbol.toUpperCase()
-    }).orderBy('date', 'desc').limit(limit).then((quotes) => {
+    }).orderBy('x', 'desc').limit(limit).then((quotes) => {
       if(!quotes.length) {
         return null;
       }

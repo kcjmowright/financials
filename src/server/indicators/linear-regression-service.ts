@@ -22,9 +22,9 @@ export class LinearRegressionService {
     if(!symbol) {
       return Promise.reject(new Error('Invalid ticker symbol.'));
     }
-    return this.knex('quotes').select('close', 'date').where({
+    return this.knex('quotes').select('x', 'y').where({
       ticker: symbol.toUpperCase()
-    }).orderBy('date', 'desc').limit(limit).then((quotes: any[]) => {
+    }).orderBy('x', 'desc').limit(limit).then((quotes: any[]) => {
       if(!quotes.length) {
         return null;
       }
@@ -32,8 +32,8 @@ export class LinearRegressionService {
       let y = [];
 
       quotes.forEach(quote => {
-        x.push(quote.date.getTime());
-        y.push(quote.close);
+        x.push(quote.x.getTime());
+        y.push(quote.y);
       });
       return linearLeastSquares(x, y);
     });

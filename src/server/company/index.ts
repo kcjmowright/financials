@@ -6,6 +6,8 @@ import {QuoteResource} from './quote-resource';
 import {ServerRegistrations} from '../server-registrations';
 import {IncomeStatementResource} from './income-statement-resource';
 
+export {QuoteService} from './quote-service';
+
 /**
  *
  * @param server

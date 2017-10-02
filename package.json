@@ -5,7 +5,7 @@
   "main": "lib/index",
   "types": "lib/index",
   "scripts": {
-    "build:live": "nodemon -V -w ./config -w ./src -w ./web --exec ts-node ./lib/index.js",
+    "build:live": "nodemon -V -e ts,json -w ./config -w ./src -w ./web --exec ts-node ./lib/index.js",
     "clean": "rm -fR ./lib ./coverage",
     "start": "npm run build:live",
     "start-server": "node lib/index.js",

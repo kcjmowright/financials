@@ -5,7 +5,7 @@ describe('FUNCTION: sharpeRatio', () => {
 
   let mock = JSON.parse(fs.readFileSync('./src/indicators/sharpe-ratio.mock.json', {
     encoding: 'utf8'
-  }));
+  })).map((v, idx, arr) => !idx ? 1 : v.y / arr[idx - 1].y - 1);
 
   it('should return undefined if values are undefined, null or length of series is zero', () => {
     expect(sharpeRatio(null)).not.toBeDefined();
@@ -13,12 +13,8 @@ describe('FUNCTION: sharpeRatio', () => {
     expect(sharpeRatio([])).not.toBeDefined();
   });
 
-  it('should return the Sharpe ratio for given series of points', () => {
-    expect(sharpeRatio(mock)).toEqual(0.17176304458009942);
-  });
-
   it('should return the Sharpe ratio for given series of numbers', () => {
-    expect(sharpeRatio(mock.map(v => v.y))).toEqual(0.17176304458009942);
+    expect(sharpeRatio(mock)).toEqual(0.17176304458009942);
   });
 
   it('should scale the Sharpe ratio for given series', () => {

@@ -34,7 +34,7 @@ export class Quote extends Point {
     quote.id = options.id;
     quote.ticker = options.ticker;
     if(typeof options.x === 'string') {
-      quote.x = DateUtil.toDateTime(options.x).getTime();
+      quote.x = DateUtil.toDateTime(options.x).valueOf();
     } else if(options.x instanceof Date) {
       quote.x = options.x.getTime();
     } else if(options.x === 'number') {

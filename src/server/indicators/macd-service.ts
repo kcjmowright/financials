@@ -25,9 +25,9 @@ export class MacdService {
     if(!symbol) {
       return Promise.reject(new Error('Invalid ticker symbol.'));
     }
-    return this.knex('quotes').select('close', 'date').where({
+    return this.knex('quotes').select('x', 'y').where({
       ticker: symbol.toUpperCase()
-    }).orderBy('date', 'desc').limit(limit).then((results) => {
+    }).orderBy('x', 'desc').limit(limit).then((results) => {
       if(!results.length) {
         return null;
       }

@@ -20,5 +20,10 @@
     "options": {
       "select": ["api"]
     }
+  }, {
+    "plugin": "./strategies",
+    "options": {
+      "select": ["api"]
+    }
   }]
 }
