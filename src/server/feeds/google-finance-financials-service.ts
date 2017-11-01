@@ -43,10 +43,12 @@ export class GoogleFinanceFinancialsService {
         if(index >= calls.length) {
           resolve();
         }
-        calls[index]().then(() => chain(calls, index + 1), (error: Error) => {
-          console.log(`Error : ${error.message}`);
-          chain(calls, index + 1);
-        });
+        if(!!calls[index]) {
+          calls[index]().then(() => chain(calls, index + 1), (error: Error) => {
+            console.log(`Error : ${error.message}`);
+            chain(calls, index + 1);
+          });
+        }
       }
     });
 
