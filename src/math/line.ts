@@ -110,6 +110,22 @@ export class Line {
     };
   }
 
+  /**
+   * Create a Line instance for a given slope and intercept and optional x inputs.
+   * @param {number} m slope
+   * @param {number} b y-intercept
+   * @param {number} [x1=-100] optional x value.
+   * @param {number} [x2=100] optional x value.
+   * @return {Line}
+   */
+  public static newLine(m: number, b: number, x1: number = -100, x2: number = 100): Line {
+    let fn = (x: number) => m * x + b;
+    let p1 = new Point(x1, fn(x1));
+    let p2 = new Point(x2, fn(x2));
+
+    return new Line(p1, p2);
+  }
+
 }
 
 /**
