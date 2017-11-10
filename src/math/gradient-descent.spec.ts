@@ -2,7 +2,7 @@ import * as parse from 'csv-parse/lib/sync';
 import * as fs from 'fs';
 
 import {Point} from './point';
-import {gradientDescentError} from './gradient-descent-error';
+import {sumOfSquaredDistances} from './sum-of-squared-distances';
 import {gradientDescent} from './gradient-descent';
 
 describe('', function() {
@@ -42,7 +42,7 @@ describe('', function() {
     //   error = ${gradientDescentError(b, m, points)}`);
     expect(b).toEqual(0.08893651993741346);
     expect(m).toEqual(1.4777440851894448);
-    expect(gradientDescentError(b, m, points)).toEqual(112.61481011613473);
+    expect(sumOfSquaredDistances(b, m, points)).toEqual(112.61481011613473);
   });
 
 });
