@@ -29,6 +29,12 @@ Proxy API to brokerage web sites and APIs.
 
 https://www.trade.it/
 
+### Quantl
+
+The premier source for financial, economic, and alternative datasets, serving investment professionals
+
+https://www.quandl.com/
+
 ### Nasdaq
 
 List of companies 
