@@ -33,7 +33,7 @@ export function up(knex: Knex): Promise<any> {
       table.decimal('tradeval', 16, 2);
       table.bigInteger('tradevol');
       table.index('ticker', 'quotes_ticker_index');
-      table.unique(['ticker', 'date']);
+      table.unique(['ticker', 'x']);
     })
   ]);
 }

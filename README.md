@@ -31,7 +31,6 @@ Create the database.  PostgreSQL was used to develop this.
 
 ```sh
 createdb --username postgres -E UTF-8 -T template0 --no-password --locale C financials
-knex migrate:make --env development --knexfile ./src/knexfile.ts financials
 ```
 
 Configure the database connection in [config/db.json](config/db.json)
@@ -39,7 +38,7 @@ Configure the database connection in [config/db.json](config/db.json)
 #### Build Live
 
 Starts a HAPI server and restarts it when code changes.  Requires a valid database connection.
-Configuration found at [config/manifest.json](config/manifest.json).
+Server configuration found at [config/manifest.json](config/manifest.json).
 
 ```sh
 npm run start
