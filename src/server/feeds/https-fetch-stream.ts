@@ -19,12 +19,17 @@ export class HttpsFetchStream {
   public get = (callback?: Function) => {
     console.log(`Calling ${this.host}${this.path}`);
     const options = {
+      headers: {
+        'User-Agent': 'curl/7.47.0'
+      },
       host: this.host,
       method: 'GET',
       path: this.path,
       port: 443
     };
     const req = https.request(options, (res: https.IncomingMessage) => {
+      console.log(res.statusCode);
+      console.log(res.headers);
       this.onResponse(res, callback);
     });
 

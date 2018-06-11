@@ -1,14 +1,14 @@
 import * as parse from 'csv-parse';
 import * as Knex from 'knex';
 
-import {HttpFetchStream} from './http-fetch-stream';
+import {HttpsFetchStream} from './https-fetch-stream';
 import {IncomingMessage} from 'https';
 import {Writable} from 'stream';
 
 /**
  * Calls Nasdaq to acquire a list of companies by exchange, parses and pipes the result to a db.
  */
-export class NasdaqCompaniesStream extends HttpFetchStream {
+export class NasdaqCompaniesStream extends HttpsFetchStream {
 
   /**
    *
