@@ -7,8 +7,8 @@ Financials
 
 #### Prerequisites
 
-* Node ^6.x LTS
-* NPM ^3.x
+* Node ^10.x LTS
+* NPM ^6.x
 
 #### Install from Source
 

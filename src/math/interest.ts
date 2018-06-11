@@ -22,6 +22,7 @@ export class Interest {
    * @return {number} The future value.
    */
   public static futureValue(principal: number, rate: number, timesPerYear: number, years: number) : number {
-    return principal * Math.pow((1 + (rate / timesPerYear)), (timesPerYear * years));
+    // return principal * Math.pow((1 + (rate / timesPerYear)), (timesPerYear * years));
+    return principal * (1 + (rate / timesPerYear)) ** (timesPerYear * years);
   }
 }

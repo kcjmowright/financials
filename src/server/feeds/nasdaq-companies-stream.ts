@@ -2,7 +2,7 @@ import * as parse from 'csv-parse';
 import * as Knex from 'knex';
 
 import {HttpsFetchStream} from './https-fetch-stream';
-import {IncomingMessage} from 'https';
+import {IncomingMessage} from 'http';
 import {Writable} from 'stream';
 
 /**

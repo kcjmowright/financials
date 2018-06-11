@@ -1,3 +1,4 @@
+import {IncomingMessage} from 'http';
 import * as https from 'https';
 import * as _ from 'lodash';
 
@@ -27,7 +28,7 @@ export class HttpsFetchStream {
       path: this.path,
       port: 443
     };
-    const req = https.request(options, (res: https.IncomingMessage) => {
+    const req = https.request(options, (res: IncomingMessage) => {
       console.log(res.statusCode);
       console.log(res.headers);
       this.onResponse(res, callback);
@@ -47,7 +48,7 @@ export class HttpsFetchStream {
    * @param {IncomingMessage} res response stream.
    * @param {Function} [callback] Optional callback function invoked on 'finish'.
    */
-  public onResponse = (res: https.IncomingMessage, callback?: Function) => {
+  public onResponse = (res: IncomingMessage, callback?: Function) => {
     if(_.isFunction(callback)) {
       res.on('finish', callback);
     }

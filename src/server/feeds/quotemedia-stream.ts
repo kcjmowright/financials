@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as Knex from 'knex';
 
 import {HttpsFetchStream} from './https-fetch-stream';
-import {IncomingMessage} from 'https';
+import {IncomingMessage} from 'http';
 import {QuoteDbWritable} from './quote-db-writable';
 
 /**

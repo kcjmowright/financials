@@ -16,7 +16,7 @@ export function up(knex: Knex): Promise<any> {
       table.index('ticker', 'companies_ticker_index');
     }),
 
-    knex.schema.createTable('quotes', function(table){
+    knex.schema.createTable('quotes', function(table) {
       table.increments('id').primary();
       table.string('ticker')
         .references('ticker')

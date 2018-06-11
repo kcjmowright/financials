@@ -1,5 +1,5 @@
 import {HttpsFetchStream} from './https-fetch-stream';
-import {IncomingMessage} from 'https';
+import {IncomingMessage} from 'http';
 import {GoogleFinanceFinancialsTransform} from './google-finance-financials-transform';
 import {FinancialsDbWritable} from './financials-db-writable';
 import {knex} from '../db';
